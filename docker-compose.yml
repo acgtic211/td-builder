@@ -1,0 +1,10 @@
+services:
+  tdbuilder:
+    image: tdbuilder-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tdbuilder
+    ports:
+      - "8080:80"
+    restart: unless-stopped
