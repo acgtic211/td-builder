@@ -1,0 +1,30 @@
+.navigator {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  a {
+    flex: 1;
+    text-align: center;
+    padding: 1rem 0;
+    text-decoration: none;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 4px solid transparent;
+    transition: all 0.2s ease-in-out;
+
+    &.activo {
+      background-color: white;
+      border-bottom: 4px solid #1976d2;
+      font-weight: bold;
+      color: #1976d2;
+    }
+
+    &:hover {
+      background-color: #eaeaea;
+      cursor: pointer;
+    }
+  }
+}

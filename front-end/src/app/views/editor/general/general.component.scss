@@ -1,0 +1,55 @@
+// Estilo general de formularios
+.desplegable-general {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 1rem;
+}
+
+label{
+  font-weight: bold;
+}
+
+/* Inputs y campos de texto */
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 40px;
+}
+
+//FORMULARIO DE INFORMACION GENERAL
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #ccc;
+  border-radius: 9999px;
+  overflow: hidden;
+
+  button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+    font-weight: 500;
+
+    &.selected {
+      background-color: #d5ecf5;
+    }
+
+    &:not(:last-child) {
+      border-right: 1px solid #ccc;
+    }
+
+    span {
+      margin-right: 4px;
+    }
+  }
+}

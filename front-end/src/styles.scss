@@ -1,0 +1,43 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif; // o el que prefieras
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* *** Estilos para la vista JSON *** */
+pre{
+  .key{
+    color: #c7254e;
+  }
+
+  .string{
+    color: #0074d9;
+  }
+
+  .number{
+    color: #2ecc40;
+  }
+
+  .boolean{
+    color: #ff851b;
+  }
+
+  .null{
+    color: #b10dc9;
+  }
+}
+
+//html, body { height: 100%; }
+//body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

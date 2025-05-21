@@ -1,0 +1,2 @@
+# TDBuilder
+A graphical tool that facilitates the generation, editing, and visualization of specifications for cyber-physical components based on WoT. This tool will enable users to interact intuitively with TD templates, reducing the entry barrier and promoting broader adoption of WoT standards. Additionally, by integrating principles of usability and information visibility, the user experience will be optimized, ensuring a clear understanding of the represented data.

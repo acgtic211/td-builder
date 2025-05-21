@@ -1,0 +1,56 @@
+<div class="schema-component">
+  <label>&#64;type</label>
+  <input type="text" placeholder="Enter schema @type" [(ngModel)]="datos['@type']" (ngModelChange)="emitirCambios()" />
+
+  <label>Title</label>
+  <input type="text" placeholder="Short title for the schema" [(ngModel)]="datos['title']" (ngModelChange)="emitirCambios()" />
+
+  <label>Description</label>
+  <textarea placeholder="Describe what the schema does" [(ngModel)]="datos['description']" (ngModelChange)="emitirCambios()"></textarea>
+
+  <label>Type</label>
+  <div class="button-group">
+    <button *ngFor="let t of tiposSchema"
+            [class.selected]="t.nombre === typeSelected.nombre"
+            (click)="seleccionarTipo(t.nombre)">
+      <span *ngIf="t.nombre === typeSelected.nombre">✔</span> {{ t.nombre }}
+    </button>
+  </div>
+
+  <div class="drop-zone" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+    <p *ngIf="datos.atributos?.length === 0">Drag schema attributes here</p>
+
+    <div class="campo" *ngFor="let attr of atributos">
+      <div class="cabecera">
+        <label>{{ attr.nombre }}</label>
+        <button (click)="eliminarAtributo(attr.nombre)">
+          <img src="assets/cancelar.png" alt="Remove property" />
+        </button>
+      </div>
+    
+      <ng-container [ngSwitch]="attr.type">
+        
+        <!-- String -->
+        <input *ngSwitchCase="'string'" type="text"
+               placeholder="Enter {{attr.nombre}}"
+               [(ngModel)]="attr.valor"
+               (ngModelChange)="emitirCambios()" />
+    
+        <!-- Boolean -->
+        <select *ngSwitchCase="'boolean'"
+                [(ngModel)]="attr.valor"
+                (ngModelChange)="emitirCambios()">
+          <option [ngValue]="true">true</option>
+          <option [ngValue]="false">false</option>
+        </select>
+
+        <!-- Integer -->
+        <input *ngSwitchCase="'integer'" type="number"
+               placeholder="Enter {{attr.nombre}}"
+               [ngModel]="attr.valor"
+               (ngModelChange)="attr.valor = $event; emitirCambios()"
+               inputmode="numeric" pattern="[0-9]*" />
+      </ng-container>
+    </div>
+  </div>
+</div>

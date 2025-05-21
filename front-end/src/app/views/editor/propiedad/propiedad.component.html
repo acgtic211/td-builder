@@ -1,0 +1,79 @@
+<div class="property-form">
+  <label>Name*</label>
+  <input type="text" placeholder="Enter the property name" [(ngModel)]="datos['nombre']" (ngModelChange)="emitirCambios()" />
+
+  <label>Title</label>
+  <input type="text" placeholder="Short title for the property" [(ngModel)]="datos['title']" (ngModelChange)="emitirCambios()" />
+
+  <label>Description</label>
+  <textarea placeholder="Describe what the property does" [(ngModel)]="datos['description']" (ngModelChange)="emitirCambios()"></textarea>
+
+  <label>&#64;type</label>
+  <input type="text" placeholder="Enter the @type of the property" [(ngModel)]="datos['@type']" (ngModelChange)="emitirCambios()" />
+
+  <label>Type</label>
+  <div class="button-group">
+    <button *ngFor="let t of tipos"
+            [class.selected]="t.nombre === typeSelected.nombre"
+            (click)="seleccionarTipo(t.nombre)">
+      <span *ngIf="t.nombre === typeSelected.nombre">✔</span> {{ t.nombre }}
+    </button>
+  </div>
+  
+  <div class="zona-atributos">
+    <div class="panel atributos">
+      <h4>Attributes</h4>
+      <div class="lista">
+        <div class="atributo"
+             *ngFor="let attr of atributosComunes"
+             [ngClass]="getClaseAtributo(attr)"
+             draggable="true"
+             (dragstart)="onDragStart($event, attr)">{{ attr }}
+        </div>
+      </div>
+    </div>
+
+    <div class="panel zona-soltar" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+      <p *ngIf="atributosDrop.length === 0">Drag attributes here to begin</p>
+
+      <div class="campo" *ngFor="let attr of atributosDrop">
+        <div class="cabecera">
+          <label>{{ attr.nombre }}</label>
+          <button (click)="eliminarAtributo(attr.nombre)">
+            <img src="assets/cancelar.png" alt="Remove property" />
+          </button>
+        </div>
+
+        <!-- Type selector based on attr.type -->
+        <ng-container [ngSwitch]="attr.type">
+          
+          <!-- Boolean -->
+          <select *ngSwitchCase="'boolean'"
+                  [(ngModel)]="datos[attr.nombre]"
+                  (ngModelChange)="emitirCambios()">
+            <option [ngValue]="true">true</option>
+            <option [ngValue]="false">false</option>
+          </select>
+
+          <!-- Integer -->
+          <input *ngSwitchCase="'integer'" type="number"
+                 placeholder="Enter a value for {{attr.nombre}}"
+                 [(ngModel)]="datos[attr.nombre]"
+                 (ngModelChange)="attr.valor = $event; emitirCambios()"/>
+
+          <!-- String (default) -->
+          <input *ngSwitchCase="'string'" type="text"
+                 placeholder="Enter a value for {{attr.nombre}}"
+                 [(ngModel)]="datos[attr.nombre]"
+                 (ngModelChange)="attr.valor = $event; emitirCambios()" />
+
+          <!-- Special form -->
+          <app-form *ngSwitchCase="'form'" 
+                    [(datos)]="datos" 
+                    (atributosFormUsados)="actualizarAtributosForm($event)">
+          </app-form>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="desplegable-general">
+  <label>Context</label>
+  <input
+    type="text"
+    [(ngModel)]="context"
+    (ngModelChange)="onContextChange($event)"
+    placeholder="https://www.w3.org/2019/wot/td/v1"
+  />
+
+  <label>Thing Type</label>
+  <div class="button-group">
+    <button *ngFor="let tipo of tipos"
+            [class.selected]="selectedTipo === tipo"
+            (click)="seleccionarTipo(tipo)">
+      <span *ngIf="selectedTipo === tipo">✔</span> {{ tipo }}
+    </button>
+  </div>
+
+  <div *ngIf="selectedTipo === 'Other'" class="otro-input">
+    <input type="text"
+           [(ngModel)]="otroTipo"
+           (ngModelChange)="onOtroTipoChange($event)"
+           placeholder="Specify the type" />
+  </div>
+
+  <label>Title</label>
+  <input type="text"
+         [(ngModel)]="titulo"
+         (ngModelChange)="onTituloChange($event)"
+         placeholder="E.g. Temperature Sensor" />
+
+  <label>ID (optional)</label>
+  <input type="text"
+         [(ngModel)]="id"
+         (ngModelChange)="onIDChange($event)"
+         placeholder="urn:uuid:..." />
+
+  <label>Security</label>
+  <div class="button-group">
+    <button *ngFor="let opcion of opcionesSeguridad"
+            [class.selected]="selectedSeguridad === opcion.nombreEsquema"
+            (click)="seleccionarSeguridad(opcion.nombreEsquema)">
+      <span *ngIf="selectedSeguridad === opcion.nombreEsquema">✔</span> {{ opcion.scheme }}
+    </button>
+  </div>
+
+  <div *ngIf="selectedSeguridad === 'Other'" class="otro-input">
+    <input type="text"
+           [(ngModel)]="otroSeguridad"
+           (ngModelChange)="onOtroSeguridadChange($event)"
+           placeholder="Specify the security scheme" />
+  </div> 
+
+  <label>Description</label>
+  <textarea [(ngModel)]="descripcion"
+            (ngModelChange)="onDescripcionChange($event)"
+            placeholder="Describe what the device does">
+  </textarea>
+</div>

@@ -1,0 +1,29 @@
+<div class="json-wrapper">
+  <div class="json-view">
+    <!-- Indicador de validación al inicio -->
+    <div class="validacion-indicador" [ngClass]="esValido ? 'success' : 'error'" (click)="scrollAlFinal()">
+      <span *ngIf="esValido">✔ Validated</span>
+      <span *ngIf="!esValido">✖ Invalid</span>
+    </div>
+    <!-- JSON -->
+    <pre [innerHTML]="highlightedJsonTD"></pre>
+  </div>
+
+  <!-- Validación detallada al final -->
+  <div #finalValidacion *ngIf="esValido; else erroresTemplate" class="validacion">
+    <div class="validado-badge">✔ Validated</div>
+    <strong>JSON complies with the WoT TD standard</strong>
+  </div>
+
+  <ng-template #erroresTemplate>
+    <div #finalValidacion class="errores">
+      <div class="mensaje">
+        <span class="error-badge">✖ Invalid</span>
+        <strong>The JSON does not conform to the WoT TD schema:</strong>
+      </div>
+      <ul>
+        <li *ngFor="let error of errores">{{ error }}</li>
+      </ul>
+    </div>
+  </ng-template>
+</div>

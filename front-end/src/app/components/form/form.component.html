@@ -1,0 +1,39 @@
+<div class="form">
+  <label>href*</label>
+  <input type="text" placeholder="Enter an address" [(ngModel)]="href" (ngModelChange)="emitirCambios()" />
+
+  <div class="zona-soltar" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+    <p *ngIf="atributos.length === 0">Drag attributes here</p>
+
+    <div class="campo" *ngFor="let attr of atributos">
+      <div class="cabecera">
+        <label>{{ attr.nombre }}</label>
+        <button (click)="eliminarAtributo(attr.nombre)">
+          <img src="assets/cancelar.png" alt="Remove property" />
+        </button>
+      </div>
+    
+      <ng-container [ngSwitch]="attr.type">
+        
+        <!-- String -->
+        <input *ngSwitchCase="'string'" type="text"
+               placeholder="Enter the {{attr.nombre}}"
+               [(ngModel)]="attr.valor"
+               (ngModelChange)="emitirCambios()" />
+    
+        <!-- Array -->
+        <div *ngSwitchCase="'array'" class="array-editor">
+          <div *ngFor="let item of attr.valor; let i = index; trackBy: trackByIndex" class="array-item">
+            <input type="text"
+                   placeholder="Add a {{attr.nombre}}"
+                   [(ngModel)]="attr.valor[i]"
+                   (ngModelChange)="emitirCambios()" />
+            <button (click)="eliminarElemento(attr, i)">🗑️</button>
+          </div>
+          <button (click)="agregarElemento(attr)">+ Add item</button>
+        </div>
+
+      </ng-container>
+    </div>
+  </div>
+</div>

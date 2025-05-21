@@ -1,0 +1,69 @@
+<div class="evento-formulario">
+  <label>Name*</label>
+  <input type="text" placeholder="Enter the event name" [(ngModel)]="datos['nombre']" (ngModelChange)="emitirCambios()" />
+  
+  <label>&#64;type</label>
+  <input type="text" placeholder="Enter the event type" [(ngModel)]="datos['@type']" (ngModelChange)="emitirCambios()" />
+
+  <label>Title</label>
+  <input type="text" placeholder="Short title for the event" [(ngModel)]="datos['title']" (ngModelChange)="emitirCambios()" />
+
+  <label>Description</label>
+  <textarea placeholder="Describe what the event does" [(ngModel)]="datos['description']" (ngModelChange)="emitirCambios()"></textarea>
+  
+  <div class="zona-atributos">
+    <!-- Left panel -->
+    <div class="panel atributos">
+      <h4>Attributes</h4>
+      <div class="lista">
+        <div
+          class="atributo"
+          *ngFor="let attr of atributosComunes"
+          [ngClass]="getClaseAtributo(attr)"
+          draggable="true"
+          (dragstart)="onDragStart($event, attr)">
+          {{ attr }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="panel zona-soltar" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+      <p *ngIf="atributosDrop.length === 0">Drag attributes here to begin</p>
+
+      <div class="campo" *ngFor="let attr of atributosDrop">
+        <div class="cabecera">
+          <label>{{ attr.nombre }}</label>
+          <button (click)="eliminarAtributo(attr.nombre)">
+            <img src="assets/cancelar.png" alt="Remove attribute" />
+          </button>
+        </div>
+
+        <!-- Type selector based on attr.type -->
+        <ng-container [ngSwitch]="attr.type">
+          
+          <!-- Boolean -->
+          <select *ngSwitchCase="'boolean'"
+                  [(ngModel)]="datos[attr.nombre]"
+                  (ngModelChange)="emitirCambios()">
+            <option [ngValue]="true">true</option>
+            <option [ngValue]="false">false</option>
+          </select>
+
+          <!-- Form -->
+          <app-form *ngSwitchCase="'form'" 
+                    [(datos)]="datos" 
+                    (atributosFormUsados)="actualizarAtributosForm($event)">
+          </app-form>
+
+          <!-- Schema -->
+          <app-schema *ngSwitchCase="'schema'"
+                      [(datos)]="datos[attr.nombre]"
+                      (atributosSchemaUsados)="actualizarAtributosSchema({ nombre: attr.nombre, usados: $event })"
+                      (tipoSchemaSeleccionado)="tipoSeleccionado(attr.nombre, $event)">
+          </app-schema>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

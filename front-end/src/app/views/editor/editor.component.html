@@ -1,0 +1,227 @@
+<div class="editor-view">
+  <h2>Thing Description Editor</h2>
+
+  <!-- General Information section -->
+  <details (toggle)="onToggleGeneral($event)" [open]="generalAbierto">
+    <summary>
+      <div class="summary-left">
+        <span class="arrow">▸</span>
+        <span>General Information</span>
+      </div>
+    </summary>
+    <app-general [datos]="tdService.obtenerTD()"></app-general>
+  </details>
+  
+  <!-- Properties section -->
+  <details (toggle)="onTogglePropiedades($event)" [open]="propiedadesAbierto">
+    <summary>
+      <div class="summary-left">
+        <span class="arrow">▸</span>
+        <span>Properties</span>
+      </div>
+      <ng-container *ngIf="propiedadesAbierto">
+        <ng-container *ngIf="!mostrarPropiedad; else botonesPropiedad">
+          <button class="icon-btn" *ngIf="!mostrarPropiedad && propiedadesAbierto" (click)="mostrarPropiedad = true">
+            <img src="assets/add.png" alt="Añadir propiedad">
+          </button>          
+        </ng-container>
+      
+        <ng-template #botonesPropiedad>
+          <div class="form-buttons">
+            <button (click)="guardarPropiedad()">
+              <img src="assets/tick.png" alt="Añadir propiedad">
+            </button>
+            <button (click)="cancelarPropiedad()">
+              <img src="assets/cancelar.png" alt="Cancelar propiedad">
+            </button>
+          </div>
+        </ng-template>
+      </ng-container>            
+    </summary>
+
+    <div *ngIf="!mostrarPropiedad && propiedadesLista.length == 0" class="vacio">
+      <p>No properties added.</p>
+    </div>
+
+    <div *ngIf="!mostrarPropiedad && propiedadesLista.length > 0">
+      <ul>
+        <li *ngFor="let prop of propiedadesLista">
+          <div (click)="editarPropiedad(prop)">
+            {{ prop }}
+          </div>
+          <button (click)="eliminarPropiedad(prop)" class="delete-btn">
+            <img src="assets/cancelar.png" alt="Eliminar propiedad" />
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <app-propiedad *ngIf="mostrarPropiedad"
+                    [datos]="propiedadActual"
+                    (datosChange)="propiedadActual = $event">
+    </app-propiedad>
+  </details>
+  
+  <!-- Actions section -->
+  <details (toggle)="onToggleAcciones($event)" [open]="accionesAbierto">
+    <summary>
+      <div class="summary-left">
+        <span class="arrow">▸</span>
+        <span>Actions</span>
+      </div>
+      <ng-container *ngIf="accionesAbierto">
+        <ng-container *ngIf="!mostrarAccion; else botonesAccion">
+          <button class="icon-btn" *ngIf="!mostrarAccion && accionesAbierto" (click)="mostrarAccion = true">
+            <img src="assets/add.png" alt="Añadir accion">
+          </button>          
+        </ng-container>
+      
+        <ng-template #botonesAccion>
+          <div class="form-buttons">
+            <button (click)="guardarAccion()">
+              <img src="assets/tick.png" alt="Añadir evento">
+            </button>
+            <button (click)="cancelarAccion()">
+              <img src="assets/cancelar.png" alt="Cancelar evento">
+            </button>
+          </div>
+        </ng-template>
+      </ng-container>    
+    </summary>
+  
+    <div *ngIf="!mostrarAccion && accionesLista.length == 0" class="vacio">
+      <p>No actions added.</p>
+    </div>
+
+    <div *ngIf="!mostrarAccion && accionesLista.length > 0">
+      <ul>
+        <li *ngFor="let prop of accionesLista">
+          <div (click)="editarAccion(prop)">
+            {{ prop }}
+          </div>
+          <button (click)="eliminarAccion(prop)" class="delete-btn">
+            <img src="assets/cancelar.png" alt="Eliminar accion" />
+          </button>
+        </li>
+      </ul>
+    </div>
+  
+    <app-accion *ngIf="mostrarAccion"
+                [datos]="accionActual"
+                (datosChange)="accionActual = $event">
+    </app-accion>
+  </details>
+  
+  <!-- Events section -->
+  <details (toggle)="onToggleEventos($event)" [open]="eventosAbierto">
+    <summary>
+      <div class="summary-left">
+        <span class="arrow">▸</span>
+        <span>Events</span>
+      </div>
+      <ng-container *ngIf="eventosAbierto">
+        <ng-container *ngIf="!mostrarEvento; else botonesEvento">
+          <button class="icon-btn" *ngIf="!mostrarEvento && eventosAbierto" (click)="mostrarEvento = true">
+            <img src="assets/add.png" alt="Añadir evento">
+          </button>          
+        </ng-container>
+
+        <ng-template #botonesEvento>
+          <div class="form-buttons">
+            <button (click)="guardarEvento()">
+              <img src="assets/tick.png" alt="Añadir evento">
+            </button>
+            
+            <button (click)="cancelarEvento()">
+              <img src="assets/cancelar.png" alt="Cancelar evento">
+            </button>
+          </div>
+        </ng-template>
+      </ng-container>    
+    </summary>
+
+    <div *ngIf="!mostrarEvento && eventosLista.length == 0" class="vacio">
+      <p>No events added.</p>
+    </div>
+
+    <div *ngIf="!mostrarEvento && eventosLista.length > 0">
+      <ul>
+        <li *ngFor="let prop of eventosLista">
+          <div (click)="editarEvento(prop)">
+            {{ prop }}
+          </div>
+          <button (click)="eliminarEvento(prop)" class="delete-btn">
+            <img src="assets/cancelar.png" alt="Eliminar evento" />
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <app-evento *ngIf="mostrarEvento"
+                [datos]="eventoActual"
+                (datosChange)="eventoActual = $event">
+    </app-evento>
+  </details>
+  
+  <!-- Links section -->
+  <details (toggle)="onToggleLinks($event)" [open]="linksAbierto">
+    <summary>
+      <div class="summary-left">
+        <span class="arrow">▸</span>
+        <span>Links</span>
+      </div>
+      <ng-container *ngIf="linksAbierto">
+        <ng-container *ngIf="!mostrarLink; else botonesLink">
+          <button class="icon-btn" *ngIf="!mostrarLink && linksAbierto" (click)="mostrarLink = true">
+            <img src="assets/add.png" alt="Añadir link">
+          </button>          
+        </ng-container>
+
+        <ng-template #botonesLink>
+          <div class="form-buttons">
+            <button (click)="guardarLink()">
+              <img src="assets/tick.png" alt="Añadir Link">
+            </button>
+            
+            <button (click)="cancelarLink()">
+              <img src="assets/cancelar.png" alt="Cancelar Link">
+            </button>
+          </div>
+        </ng-template>
+      </ng-container>    
+    </summary>
+
+    <div *ngIf="!mostrarLink && linksLista.length == 0" class="vacio">
+      <p>No Links added.</p>
+    </div>
+
+    <div *ngIf="!mostrarLink && linksLista.length > 0">
+      <ul>
+        <li *ngFor="let link of linksLista">
+          <div (click)="editarLink(link.href)">
+            {{ link.href }}
+          </div>
+          <button (click)="eliminarLink(link.href)" class="delete-btn">
+            <img src="assets/cancelar.png" alt="Eliminar link" />
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <app-links *ngIf="mostrarLink"
+                [datos]="linkActual"
+                (datosChange)="linkActual = $event">
+    </app-links>
+  </details>
+
+  <div class="buttons">
+    <button (click)="abrirArchivo()">🗂️ Open TD</button>
+    <button (click)="resetTD()">🧹 Clear TD</button>
+    <input type="file" accept=".json"
+         #inputArchivo
+         (change)="cargarArchivoTD($event)"
+         style="display: none;" />
+    <button>💾 Save TD</button>
+    <button (click)="descargarTD()">⬇️ Download TD</button>
+  </div>
+</div>

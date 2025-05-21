@@ -1,0 +1,52 @@
+<div class="link-form">
+  <label>href*</label>
+  <input type="text" placeholder="Enter an address" [(ngModel)]="datos['href']" (ngModelChange)="emitirCambios()" />
+
+  <div class="zona-atributos">
+    <div class="panel atributos">
+      <h4>Attributes</h4>
+      <div class="lista">
+        <div class="atributo"
+             *ngFor="let attr of atributosComunes"
+             [ngClass]="getClaseAtributo(attr)"
+             draggable="true"
+             (dragstart)="onDragStart($event, attr)">{{ attr }}
+        </div>
+      </div>
+    </div>
+
+    <div class="panel zona-soltar" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+      <p *ngIf="atributosDrop.length === 0">Drag attributes here to begin</p>
+
+      <div class="campo" *ngFor="let attr of atributosDrop">
+        <div class="cabecera">
+          <label>{{ attr.nombre }}</label>
+          <button (click)="eliminarAtributo(attr.nombre)">
+            <img src="assets/cancelar.png" alt="Remove property" />
+          </button>
+        </div>
+
+        <!-- Type selector based on attr.type -->
+        <ng-container [ngSwitch]="attr.type">
+          <!-- String -->
+          <input *ngSwitchCase="'string'" type="text"
+                 placeholder="Enter the {{attr.nombre}}"
+                 [(ngModel)]="datos[attr.nombre]"
+                 (ngModelChange)="attr.valor = $event; emitirCambios()" />
+
+          <!-- Array -->
+          <div *ngSwitchCase="'array'" class="array-editor">
+            <div *ngFor="let item of attr.valor; let i = index; trackBy: trackByIndex" class="array-item">
+              <input type="text"
+                     placeholder="Add a {{attr.nombre}}"
+                     [(ngModel)]="attr.valor[i]"
+                     (ngModelChange)="emitirCambios()" />
+              <button (click)="eliminarElemento(attr, i)">🗑️</button>
+            </div>
+            <button (click)="agregarElemento(attr)">+ Add item</button>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
