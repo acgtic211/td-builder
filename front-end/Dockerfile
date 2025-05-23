@@ -5,12 +5,12 @@ FROM node:20.14.0-alpine AS build-step
 WORKDIR /app
 
 # Copiar dependencias
-COPY front-end/package*.json ./
+COPY package*.json ./
 
 RUN npm install
 
 # Copiar el resto de la app y construirla
-COPY front-end/ /app
+COPY . /app
 RUN npm run build --prod
 
 # Etapa 2: Servir con Nginx

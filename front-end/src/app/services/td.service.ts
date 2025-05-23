@@ -9,9 +9,9 @@ export class TdService {
     '@context': 'https://www.w3.org/2019/wot/td/v1',
     id: '',
     title: '',
-    security: 'nosec',
+    security: 'nosec_sc',
     securityDefinitions: {
-      "nosec": {
+      "nosec_sc": {
         "scheme": "nosec"
       }
     },

@@ -1,4 +1,13 @@
 <div class="desplegable-general">
+  <label>Thing Description Name</label>
+  <input
+    type="text"
+    [(ngModel)]="nombre"
+    value="nombre"
+    (ngModelChange)="emitirCambios()"
+    placeholder="TD name"
+  />
+
   <label>Context</label>
   <input
     type="text"

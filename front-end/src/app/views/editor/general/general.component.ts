@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { NgIf, NgFor, CommonModule} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TdService } from '../../../services/td.service';
@@ -13,6 +13,8 @@ import { seguridadMap } from '../../../variables';
 })
 export class GeneralComponent implements OnChanges {
   @Input() datos: any = {};
+  @Input() nombre: string = '';
+  @Output() nombreChange = new EventEmitter<string>();
 
   context = '';
   titulo = '';
@@ -24,6 +26,7 @@ export class GeneralComponent implements OnChanges {
   otroSeguridad = '';
 
   tipos = ['Sensor', 'Actuador', 'Servicio', 'DataSet', 'Otro'];
+  
   opcionesSeguridad = Object.entries(seguridadMap).map(([key, value]) => ({
     nombreEsquema: key, 
     scheme: value    
@@ -43,7 +46,12 @@ export class GeneralComponent implements OnChanges {
       this.otroTipo = this.selectedTipo && !this.tipos.includes(this.selectedTipo) ? this.selectedTipo : '';
       this.selectedSeguridad = (td.securityDefinitions && Object.keys(td.securityDefinitions)[0]) || '';
       this.otroSeguridad = this.selectedSeguridad &&
-      !this.opcionesSeguridad.some(op => op.nombreEsquema === this.selectedSeguridad) ? this.selectedSeguridad : '';}
+      !this.opcionesSeguridad.some(op => op.nombreEsquema === this.selectedSeguridad) ? this.selectedSeguridad : '';
+    }
+  }
+
+  emitirCambios(){
+    this.nombreChange.emit(this.nombre);
   }
 
   onContextChange(nuevoContext: string) {
@@ -78,12 +86,11 @@ export class GeneralComponent implements OnChanges {
   seleccionarSeguridad(tipo: string) {
     this.selectedSeguridad = tipo;
 
-    const nombreEsquema = tipo === 'Otro' ? this.otroSeguridad : `${tipo}_sc`;
+    const nombreEsquema = tipo === 'Otro' ? this.otroSeguridad : `${tipo}`;
     const scheme = seguridadMap[nombreEsquema] || 'nosec';
 
     this.tdService.actualizarSeguridad(nombreEsquema, scheme);
   }
-
 
   onOtroSeguridadChange(nuevoSeguridad: string) {
     this.otroSeguridad = nuevoSeguridad;

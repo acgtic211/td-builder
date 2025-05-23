@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, output, ViewChild } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { DesplegablesService } from '../../services/desplegables.service';
 import { TdService } from '../../services/td.service';
@@ -18,6 +18,8 @@ import { seguridadMap } from '../../variables';
 })
 export class EditorComponent implements OnInit {
   @ViewChild('inputArchivo') inputArchivo!: ElementRef;
+  user: boolean = false;
+  nombreTD: string = "TD Name";
   
   mostrarPropiedad = false;
   propiedadActual: any = null;
@@ -368,7 +370,13 @@ export class EditorComponent implements OnInit {
   }
 
   descargarTD() {
-    const nombre = prompt('¿Nombre del archivo?', 'thing-description.json');
+    const nombreBase = this.nombreTD?.trim() || 'thing-description';
+    const nombreSeguro = nombreBase
+      .toLowerCase()
+      .replace(/\s+/g, '-')        // espacios a guiones
+      .replace(/[^a-z0-9\-]/gi, ''); // elimina caracteres no válidos
+
+    const nombre = prompt('¿Nombre del archivo?', `${nombreSeguro}.json`);
     if (!nombre || !nombre.trim()) return; // si cancela o deja vacío, no hace nada
 
     const td = this.tdService.obtenerTD();
@@ -458,5 +466,9 @@ export class EditorComponent implements OnInit {
   resetTD(){
     this.tdService.resetTD();
     this.ngOnInit();
+  }
+
+  guardarTD(){
+    
   }
 }

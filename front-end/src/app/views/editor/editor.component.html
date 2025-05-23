@@ -1,5 +1,5 @@
 <div class="editor-view">
-  <h2>Thing Description Editor</h2>
+  <h2>Thing Description Editor: {{nombreTD}}</h2>
 
   <!-- General Information section -->
   <details (toggle)="onToggleGeneral($event)" [open]="generalAbierto">
@@ -9,7 +9,9 @@
         <span>General Information</span>
       </div>
     </summary>
-    <app-general [datos]="tdService.obtenerTD()"></app-general>
+    <app-general [datos]="tdService.obtenerTD()"
+                 [(nombre)]="nombreTD">
+    </app-general>
   </details>
   
   <!-- Properties section -->
@@ -221,7 +223,7 @@
          #inputArchivo
          (change)="cargarArchivoTD($event)"
          style="display: none;" />
-    <button>💾 Save TD</button>
+    <button *ngIf="user">💾 Save TD</button>
     <button (click)="descargarTD()">⬇️ Download TD</button>
   </div>
 </div>

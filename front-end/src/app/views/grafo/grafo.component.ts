@@ -18,7 +18,7 @@ interface CustomHierarchyNode extends d3.HierarchyNode<any> {
   styleUrl: './grafo.component.scss'
 })
 export class GrafoComponent implements OnInit {
- @ViewChild('treeContainer', { static: true }) container!: ElementRef;
+  @ViewChild('treeContainer', { static: true }) container!: ElementRef;
 
   constructor(private tdService: TdService) {}
 
@@ -31,33 +31,42 @@ export class GrafoComponent implements OnInit {
   buildHierarchy(obj: any, name: string = 'TD'): any {
     const children: any[] = [];
 
-    Object.entries(obj).forEach(([key, value]) => {
-      if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
-        children.push(this.buildHierarchy(value, key));
-      } else {
-        children.push({ name: `${key}: ${value}` });
-      }
-    });
+    if (Array.isArray(obj)) {
+      obj.forEach((value, i) => {
+        if (value !== null && typeof value === 'object') {
+          children.push(this.buildHierarchy(value, `[${i}]`));
+        } else {
+          children.push({ name: `[${i}]: ${value}` });
+        }
+      });
+    } else if (obj !== null && typeof obj === 'object') {
+      Object.entries(obj).forEach(([key, value]) => {
+        if (value !== null && typeof value === 'object') {
+          children.push(this.buildHierarchy(value, key));
+        } else {
+          children.push({ name: `${key}: ${value}` });
+        }
+      });
+    }
 
-    return { name, children };
+    return { name, children: children.length > 0 ? children : undefined };
   }
 
   renderTree(data: any) {
-    const width = 900;
-    const dx = 20;
-    const dy = 160;
-    const duration = 300;
+    const dx = 30;
+    const dy = 180;
+    const duration = 400;
 
-    const tree = d3.tree().nodeSize([dx, dy]);
     const root: CustomHierarchyNode = d3.hierarchy(data) as CustomHierarchyNode;
-    root.x0 = dx;
+    root.x0 = 0;
     root.y0 = 0;
 
     let index = 0;
 
     const svg = d3.select(this.container.nativeElement)
       .append('svg')
-      .attr('viewBox', [-dy / 2, -dx, width, dx * 40])
+      .attr('width', '100%')
+      .attr('height', '100%')
       .style('font', '12px sans-serif')
       .style('user-select', 'none');
 
@@ -74,17 +83,33 @@ export class GrafoComponent implements OnInit {
       .x((d: any) => d.y)
       .y((d: any) => d.x);
 
+    function collapse(d: CustomHierarchyNode) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = undefined;
+      }
+    }
+
     const update = (source: CustomHierarchyNode) => {
       const nodes = root.descendants();
       const links = root.links();
 
-      tree(root);
-
       let i = 0;
-      root.eachBefore((d: any) => {
+      root.eachBefore((d: CustomHierarchyNode) => {
         d.x = i++ * dx;
         d.y = d.depth * dy;
       });
+
+      const height = i * dx + 100;
+      const width = (root.height + 2) * dy;
+
+      svg.transition().duration(duration).attr('viewBox', [
+        -dy,
+        -dx,
+        width,
+        height
+      ].join(','));
 
       // Nodes
       const node = gNode.selectAll('g')
@@ -93,7 +118,13 @@ export class GrafoComponent implements OnInit {
       const nodeEnter = node.enter().append('g')
         .attr('transform', d => `translate(${source.y0},${source.x0})`)
         .on('click', (_, d: CustomHierarchyNode) => {
-          d.children = d.children ? undefined : d._children;
+          if (d.children) {
+            d._children = d.children;
+            d.children = undefined;
+          } else {
+            d.children = d._children;
+            d._children = undefined;
+          }
           update(d);
         });
 
@@ -109,36 +140,47 @@ export class GrafoComponent implements OnInit {
         .clone(true).lower()
         .attr('stroke', 'white');
 
-      (node as any).merge(nodeEnter as any)
+      const nodeUpdate = nodeEnter.merge(node as any)
         .transition().duration(duration)
-        .attr('transform', (d: { y: any; x: any; }) => `translate(${d.y},${d.x})`);
+        .attr('transform', d => `translate(${d.y},${d.x})`);
+
+      const nodeExit = node.exit().transition().duration(duration)
+        .attr('transform', d => `translate(${source.y},${source.x})`)
+        .remove();
+
+      nodeExit.select('circle').attr('r', 0);
+      nodeExit.select('text').style('fill-opacity', 0);
 
       // Links
       const link = gLink.selectAll('path')
         .data(links, (d: any) => d.target.id);
 
-      link.enter().append('path')
+      const linkEnter = link.enter().append('path')
         .attr('d', () => {
           const o = { x: source.x0!, y: source.y0! };
           return diagonal({ source: o, target: o } as any);
-        })
-        .merge(link as any).transition()
+        });
+
+      linkEnter.merge(link as any).transition()
         .duration(duration)
         .attr('d', diagonal as any);
 
+      link.exit().transition().duration(duration)
+        .attr('d', () => {
+          const o = { x: source.x!, y: source.y! };
+          return diagonal({ source: o, target: o } as any);
+        })
+        .remove();
+
       // Store old positions
-      root.each((d: CustomHierarchyNode) => {
+      root.each(d => {
         d.x0 = d.x;
         d.y0 = d.y;
       });
     };
 
     // Colapsar nodos al inicio
-    root.children?.forEach((d: CustomHierarchyNode) => {
-      d._children = d.children;
-      d.children = undefined;
-    });
-
+    root.children?.forEach(collapse);
     update(root);
   }
 }

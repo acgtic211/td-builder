@@ -9,4 +9,8 @@ import { Component } from '@angular/core';
 })
 export class HeaderComponent {
   rutaImagenPerfil: string = 'assets/perfil.png'
+
+  signIn(){
+    alert("Sign In will be avalible soon")
+  }
 }
