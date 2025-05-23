@@ -1,8 +1,8 @@
 services:
   tdbuilder:
     build:
-      context: ./front-end
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: front-end/Dockerfile
     container_name: tdbuilder
     ports:
       - "80:80"

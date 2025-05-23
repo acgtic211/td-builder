@@ -5,12 +5,11 @@ FROM node:20.14.0-alpine AS build-step
 WORKDIR /app
 
 # Copiar dependencias
-COPY package*.json ./
-
+COPY front-end/package*.json ./
 RUN npm install
 
 # Copiar el resto de la app y construirla
-COPY . /app
+COPY front-end/. .
 RUN npm run build --prod
 
 # Etapa 2: Servir con Nginx
@@ -18,6 +17,7 @@ FROM nginx:alpine
 
 COPY --from=build-step /app/dist/front-end/browser /usr/share/nginx/html
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar configuración personalizada de Nginx
+COPY deployment/nginx.conf /etc/nginx/conf.d/default.conf
 
 CMD ["nginx", "-g", "daemon off;"]

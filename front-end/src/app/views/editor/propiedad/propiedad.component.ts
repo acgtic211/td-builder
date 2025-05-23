@@ -46,6 +46,10 @@ export class PropiedadComponent implements OnInit {
       };
     }
 
+    if (!this.datos.hasOwnProperty('forms')) {
+      this.datos['forms'] = [];
+    }
+
     // Detectar atributos personalizados existentes
     this.atributosDrop = Object.keys(this.datos)
       .filter(nombre =>
@@ -60,6 +64,11 @@ export class PropiedadComponent implements OnInit {
 
         return { nombre, type: tipo };
       });
+
+    const tieneForms = this.atributosDrop.some(attr => attr.nombre === 'forms');
+    if (!tieneForms) {
+      this.atributosDrop.unshift({ nombre: 'forms', type: 'form' });
+    }
 
     // Asignar tipo seleccionado si ya existía
     const tipoExistente = this.datos['type'];

@@ -31,6 +31,10 @@ export class EventoComponent implements OnInit{
       };
     }
 
+    if (!this.datos.hasOwnProperty('forms')) {
+      this.datos['forms'] = [];
+    }
+
     this.atributosDrop = Object.keys(this.datos)
       .filter(nombre =>
         !['@type', 'type', 'title', 'description', 'nombre'].includes(nombre)
@@ -58,6 +62,11 @@ export class EventoComponent implements OnInit{
 
         return attr;
       });
+
+    const tieneForms = this.atributosDrop.some(attr => attr.nombre === 'forms');
+    if (!tieneForms) {
+      this.atributosDrop.unshift({ nombre: 'forms', type: 'form' });
+    }
 
     this.actualizarAtributos();
   }
