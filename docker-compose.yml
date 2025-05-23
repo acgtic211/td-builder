@@ -1,6 +1,5 @@
 services:
   tdbuilder:
-    image: tdbuilder-app
     build:
       context: ./front-end
       dockerfile: Dockerfile
