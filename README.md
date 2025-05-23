@@ -19,7 +19,7 @@ This tool reduces the learning curve for working with TDs by enabling users to i
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/dlg383/TDBuilder.git
+git clone https://github.com/acgtic211/TDBuilder.git
 cd TDBuilder
 ```
 
