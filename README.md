@@ -11,7 +11,6 @@ This tool reduces the learning curve for working with TDs by enabling users to i
 - Visually create and edit **Thing Descriptions**.
 - Expand and collapse JSON structures dynamically.
 - View TD data in a structured, readable format.
-- Built-in support for WoT-compliant properties and forms.
 
 ---
 
