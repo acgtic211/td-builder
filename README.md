@@ -11,8 +11,27 @@ This tool reduces the learning curve for working with TDs by enabling users to i
 - Visually create and edit **Thing Descriptions**.
 - Expand and collapse JSON structures dynamically.
 - View TD data in a structured, readable format.
+- **Backedn REST API** to:
+  - Register users on first login (with google)
+  - Save a user’s TDs
+  - List and search a user’s TDs.
+  - Delete TDs.
+
 
 ---
+
+## 🧱 Architecture
+
+- **Frontend:** Angular built app served by **Nginx** → http://localhost
+- **Backend:** Spring Boot (Temurin JDK 17) → http://localhost:8080/api
+- **Database:** PostgreSQL (service name db)
+
+> All protected endpoints live under ```/api/save/**``` (authentication required).
+Other routes are denied by default.
+
+
+---
+
 
 ## 🛠 How to Use
 
