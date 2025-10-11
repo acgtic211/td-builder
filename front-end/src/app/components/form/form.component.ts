@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { NgIf, NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { atributosForm } from '../../variables';
+import { atributosForm } from '../../models/variables';
 
 @Component({
   selector: 'app-form',

@@ -1,0 +1,15 @@
+<div class="dlg-overlay" *ngIf="dialog.active() as d">
+      <div class="backdrop" (click)="d.dismissible && dialog.dismiss()"></div>
+      <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="d.title || 'Diálogo'">
+        <h3 class="title" *ngIf="d.title">{{ d.title }}</h3>
+        <p class="msg" *ngIf="d.message">{{ d.message }}</p>
+        <div class="actions">
+          <button *ngFor="let a of d.actions"
+                  class="btn"
+                  [ngClass]="a.variant || 'default'"
+                  (click)="dialog.resolve(a.id)">
+            {{ a.label }}
+          </button>
+        </div>
+      </div>
+    </div>

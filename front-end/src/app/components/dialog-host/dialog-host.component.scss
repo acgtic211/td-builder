@@ -1,0 +1,88 @@
+/* ===== Tokens opcionales ===== */
+$z-overlay: 9999;
+$panel: #ffffff;
+$border: #e5e7eb;
+$text-900: #101828;
+$text-700: #344054;
+$brand-600: #2f55d4;
+$danger-600: #e11d48;
+$secondary-bg:#E3E9FF;
+$neutral-bg:#E9EDF2;
+
+.dlg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-overlay;
+  display: grid;
+  place-items: center;
+
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 24, 40, 0.45);
+  }
+
+  .modal {
+    position: relative;
+    max-width: 520px;
+    width: 92%;
+    background: $panel;
+    border: 1px solid $border;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(16, 24, 40, 0.2);
+    padding: 18px;
+
+    .title {
+      margin: 0 0 6px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: $text-900;
+    }
+
+    .msg {
+      margin: 0 0 14px 0;
+      color: $text-700;
+    }
+
+    .actions {
+      display: flex;
+      gap: .5rem;
+      justify-content: flex-end;
+
+      .btn {
+        padding: .5rem .9rem;
+        border-radius: 8px;
+        border: 1px solid $neutral-bg;
+        background: $neutral-bg;
+        color: $text-900;
+        cursor: pointer;
+        transition: background .15s ease, filter .15s ease, border-color .15s ease;
+
+        &:hover { filter: brightness(.80); }
+
+        /* variantes */
+        &.primary {
+          background: $brand-600;
+          border-color: $brand-600;
+          color: #fff;
+          &:hover { filter: brightness(.80); }
+        }
+
+        &.danger {
+          background: $danger-600;
+          border-color: $danger-600;
+          color: #fff;
+          &:hover { filter: brightness(.80); }
+        }
+
+        /* opcional: secondary (más marcado que el neutro) */
+        &.secondary {
+          background: $secondary-bg;
+          border-color: $secondary-bg;
+          color: #1d2b6b;
+          &:hover { filter: brightness(.80); }
+        }
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { NgIf, NgFor, CommonModule} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TdService } from '../../../services/td.service';
-import { seguridadMap } from '../../../variables';
+import { seguridadMap } from '../../../models/variables';
 
 @Component({
   selector: 'app-general',
@@ -50,7 +50,8 @@ export class GeneralComponent implements OnChanges {
     }
   }
 
-  emitirCambios(){
+  onNameChange(){
+    this.tdService.setNameTD(this.nombre);
     this.nombreChange.emit(this.nombre);
   }
 

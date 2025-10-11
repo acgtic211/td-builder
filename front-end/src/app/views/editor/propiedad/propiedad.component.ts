@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { NgIf, NgFor, NgClass, NgSwitchCase, NgSwitch } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { atributosForm, atributosInteracciones, atributosSchema, Interaccion, TipoSchema } from '../../../variables';
+import { atributosForm, atributosInteracciones, atributosSchema, Interaccion, TipoSchema } from '../../../models/variables';
 import { FormComponent } from '../../../components/form/form.component';
 
 interface Tipo{

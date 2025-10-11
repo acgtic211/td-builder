@@ -9,9 +9,32 @@
 .editor-view {
   margin: 2.5%;
 
-  h2 {
-    font-size: 1.5rem;
+  .editor-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     margin-bottom: 2rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .btn-ghost {
+      border: 1px solid #e5e7eb;        // $border
+      background: #fff;                  // panel blanco
+      color: #2f55d4;                    // $brand-600
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      transition: background .15s ease, transform .12s ease, border-color .15s ease;
+
+      &:hover { background: #f8fafc; border-color: #d0d5dd; transform: translateY(-1px); }
+      &:active { transform: translateY(0); }
+    }
   }
 
   details {

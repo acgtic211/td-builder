@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, output, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { DesplegablesService } from '../../services/desplegables.service';
 import { TdService } from '../../services/td.service';
@@ -7,7 +7,11 @@ import { PropiedadComponent } from './propiedad/propiedad.component';
 import { AccionComponent } from './accion/accion.component';
 import { EventoComponent } from './evento/evento.component';
 import { LinksComponent } from './links/links.component';
-import { seguridadMap } from '../../variables';
+import { seguridadMap } from '../../models/variables';
+import { AuthGoogleService } from '../../services/auth-google.service';
+import { Subscription } from 'rxjs';
+import { DialogService } from '../../services/dialog.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-editor',
@@ -16,10 +20,10 @@ import { seguridadMap } from '../../variables';
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent implements OnInit, OnDestroy{
   @ViewChild('inputArchivo') inputArchivo!: ElementRef;
   user: boolean = false;
-  nombreTD: string = "TD Name";
+  nombreTD: string = '';
   
   mostrarPropiedad = false;
   propiedadActual: any = null;
@@ -41,14 +45,53 @@ export class EditorComponent implements OnInit {
   linksLista: { href: string; [key: string]: any }[] = [];
   direccionLinkActual: string = '';
 
-  constructor(public desplegables: DesplegablesService, public tdService: TdService) {}
+  private readonly _panes: Array<'general'|'propiedades'|'acciones'|'eventos'|'links'> =
+    ['general', 'propiedades', 'acciones', 'eventos', 'links'];
+
+  constructor(public desplegables: DesplegablesService, public tdService: TdService, private authGoogleService: AuthGoogleService, private dialog: DialogService, private router: Router) {}
+  loggedIn: boolean = false;
+  private sub1?: Subscription;
+  isUpdate: boolean = false;
+  private sub2?: Subscription;
 
   ngOnInit(): void {
+    this.cargatTd();
+
+    this.sub1 = this.authGoogleService.loggedIn$.subscribe(estado => {
+      this.loggedIn = estado;
+    });
+
+    this.sub2 = this.tdService.isUpdate$.subscribe(estado => {
+      this.isUpdate = estado;
+    });
+  }
+  
+  cargatTd(){
+    this.nombreTD = this.tdService.getNameTD();
     this.propiedadesLista = Object.keys(this.tdService.obtenerTD().properties || {});
     this.accionesLista = Object.keys(this.tdService.obtenerTD().actions || {});
     this.eventosLista = Object.keys(this.tdService.obtenerTD().events || {});
     this.linksLista = this.tdService.obtenerTD().links || [];
-  }  
+  }
+
+  ngOnDestroy() {
+    this.sub1?.unsubscribe();
+    this.sub2?.unsubscribe();
+  }
+
+  get areAllOpen(): boolean {
+    return this._panes.every(k => this.desplegables.getEstado(k));
+  }
+
+  private setAll(open: boolean) {
+    this._panes.forEach(k => this.desplegables.setEstado(k, open));
+    // refresca listas si quieres forzar redibujado (no es estrictamente necesario)
+    this.cargatTd();
+  }
+
+  toggleAll() {
+    this.setAll(!this.areAllOpen);
+  }
 
   onToggleGeneral(event: any) {
     this.desplegables.setEstado('general', event.target.open);
@@ -148,9 +191,8 @@ export class EditorComponent implements OnInit {
   }
 
   eliminarPropiedad(nombre: string) {
-    if (this.tdService.obtenerTD().properties?.[nombre]) {
-      delete this.tdService.obtenerTD().properties[nombre];
-      this.propiedadesLista = Object.keys(this.tdService.obtenerTD().properties || {});
+    if (this.tdService.removeProperty(nombre)) {
+      this.propiedadesLista = Object.keys(this.tdService.getProperties() || {});
     } else {
       console.warn(`No se encontró la propiedad ${nombre}`);
     }
@@ -214,11 +256,10 @@ export class EditorComponent implements OnInit {
   }
 
   eliminarAccion(nombre: string) {
-    if (this.tdService.obtenerTD().actions?.[nombre]) {
-      delete this.tdService.obtenerTD().actions[nombre];
-      this.accionesLista = Object.keys(this.tdService.obtenerTD().actions || {});
+    if (this.tdService.removeAction(nombre)) {
+      this.accionesLista = Object.keys(this.tdService.getAction() || {});
     } else {
-      console.warn(`No se encontró la accion ${nombre}`);
+      console.warn(`No se encontró la acción ${nombre}`);
     }
   }
 
@@ -280,9 +321,8 @@ export class EditorComponent implements OnInit {
   }
 
   eliminarEvento(nombre: string) {
-    if (this.tdService.obtenerTD().events?.[nombre]) {
-      delete this.tdService.obtenerTD().events[nombre];
-      this.eventosLista = Object.keys(this.tdService.obtenerTD().events || {});
+    if (this.tdService.removeEvent(nombre)) {
+      this.eventosLista = Object.keys(this.tdService.getEvent() || {});
     } else {
       console.warn(`No se encontró el evento ${nombre}`);
     }
@@ -369,28 +409,54 @@ export class EditorComponent implements OnInit {
     }
   }
 
-  descargarTD() {
+  async descargarTD() {
     const nombreBase = this.nombreTD?.trim() || 'thing-description';
     const nombreSeguro = nombreBase
       .toLowerCase()
-      .replace(/\s+/g, '-')        // espacios a guiones
-      .replace(/[^a-z0-9\-]/gi, ''); // elimina caracteres no válidos
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\-]/gi, '');
 
-    const nombre = prompt('¿Nombre del archivo?', `${nombreSeguro}.json`);
-    if (!nombre || !nombre.trim()) return; // si cancela o deja vacío, no hace nada
-
+    const sugerido = `${nombreSeguro || 'thing-description'}.json`;
     const td = this.tdService.obtenerTD();
-    const json = JSON.stringify(td, null, 2);
+    const contenido = JSON.stringify(td, null, 2);
+    const blob = new Blob([contenido], { type: 'application/json' });
 
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
+    // 1) Intento con File System Access API (Chromium)
+    try {
+      // feature detection
+      const anyWindow = window as any;
+      if (typeof anyWindow.showSaveFilePicker === 'function') {
+        const handle = await anyWindow.showSaveFilePicker({
+          suggestedName: sugerido,
+          types: [{
+            description: 'Thing Description (JSON)',
+            accept: { 'application/json': ['.json'] }
+          }]
+        });
 
+        const stream = await handle.createWritable();
+        await stream.write(blob);
+        await stream.close();
+        return;
+      }
+    } catch (err) {
+      // Si el usuario cancela, simplemente salimos sin error
+      console.warn('Guardado cancelado o error en showSaveFilePicker:', err);
+      return;
+    }
+
+    // 2) Fallback universal (<a download>) – el navegador decide la carpeta
+    const nombre = prompt('Nombre del archivo', sugerido);
+    if (!nombre || !nombre.trim()) return;
+
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = nombre.trim().endsWith('.json') ? nombre.trim() : `${nombre.trim()}.json`;
+    document.body.appendChild(a);
     a.click();
-
-    window.URL.revokeObjectURL(url);
+    a.remove();
+    URL.revokeObjectURL(url);
   }
 
   abrirArchivo() {
@@ -402,24 +468,30 @@ export class EditorComponent implements OnInit {
     const archivo = input.files?.[0];
     if (!archivo) return;
 
+    const baseName = archivo.name.replace(/\.[^/.]+$/, '');
+
     const lector = new FileReader();
     lector.onload = () => {
       try {
         const contenido = JSON.parse(lector.result as string);
-        this.procesarTDImportado(contenido);
+        this.procesarTDImportado(baseName, contenido);
       } catch (e) {
         alert('El archivo no es un JSON válido.');
       }
     };
     lector.readAsText(archivo);
+    this.tdService.setIsUpdate(false);
+    this.tdService.setIdUpdate(-1);
   }
 
-  procesarTDImportado(json: any) {
+  procesarTDImportado(name: string, json: any) {
     if (!json || typeof json !== 'object') {
       alert('El archivo no contiene un TD válido.');
       return;
     }
     this.tdService.resetTD();
+    
+    this.tdService.setNameTD?.(name);
     // Solo carga propiedades conocidas del TD
     if (json['@context']) this.tdService.actualizarContext(json['@context']);
     if (json['@type']) this.tdService.actualizarTipo(json['@type']);
@@ -459,16 +531,132 @@ export class EditorComponent implements OnInit {
         }
       }
     }
+    this.refreshLists();
+    this.autoOpenSections();
 
-    this.ngOnInit();
+    this.cargatTd();
+  }
+
+  private refreshLists() {
+    const td = this.tdService.obtenerTD();
+    this.propiedadesLista = Object.keys(td.properties || {});
+    this.accionesLista    = Object.keys(td.actions || {});
+    this.eventosLista     = Object.keys(td.events || {});
+    this.linksLista       = td.links || [];
+  }
+
+  private autoOpenSections() {
+    const td = this.tdService.obtenerTD();
+    const hasProps   = td.properties && Object.keys(td.properties).length > 0;
+    const hasActions = td.actions && Object.keys(td.actions).length > 0;
+    const hasEvents  = td.events && Object.keys(td.events).length > 0;
+    const hasLinks   = Array.isArray(td.links) && td.links.length > 0;
+
+    this.desplegables.setEstado('propiedades', hasProps);
+    this.desplegables.setEstado('acciones',    hasActions);
+    this.desplegables.setEstado('eventos',     hasEvents);
+    this.desplegables.setEstado('links',       hasLinks);
+  }
+
+  private closeAllSections() {
+    this.desplegables.setEstado('propiedades', false);
+    this.desplegables.setEstado('acciones',    false);
+    this.desplegables.setEstado('eventos',     false);
+    this.desplegables.setEstado('links',       false);
   }
 
   resetTD(){
+    this.nombreTD = "TD Name";
     this.tdService.resetTD();
-    this.ngOnInit();
+    this.cargatTd();
+    this.closeAllSections();
   }
 
-  guardarTD(){
-    
+  guardarTD() {
+    this.tdService.guardarTD(this.nombreTD).subscribe({
+      next: async (createdId: number) => {
+        const res = await this.dialog.open({
+          title: 'Thing Description saved',
+          message: 'What would you like to do next?',
+          dismissible: true,
+          actions: [
+            { id: 'continue', label: 'Continue editing', variant: 'primary' },
+            { id: 'new',      label: 'Create new', variant: 'secondary' },
+            { id: 'list',     label: 'View my TDs', variant: 'secondary'}
+          ]
+        });
+
+        switch (res) {
+          case 'continue':
+            // seguir editando la recién creada
+            this.tdService.setIsUpdate(true);
+            this.tdService.setIdUpdate(createdId);   // <-- usa el ID devuelto
+            break;
+
+          case 'new':
+            this.nombreTD = 'Thing’s Name';
+            this.tdService.resetTD();
+            this.tdService.setIsUpdate(false);
+            this.tdService.setIdUpdate(-1);
+            break;
+
+          case 'list':
+            this.router.navigate(['/my-tds']);
+            break;
+
+          default:
+            // dismiss o nada: no hacer nada
+            break;
+        }
+      },
+      error: e => console.error('Error', e)
+    });
   }
+
+  createNew(){
+    this.tdService.setIdUpdate(-1);
+    this.tdService.setIsUpdate(false);
+    this.resetTD();
+  }
+
+  updateTD() {
+    this.tdService.updateTD(this.nombreTD).subscribe({
+      next: async () => {
+        const res = await this.dialog.open({
+          title: 'Thing Description updated',
+          message: 'What would you like to do next?',
+          dismissible: true,
+          actions: [
+            { id: 'continue', label: 'Continue editing', variant: 'primary' },
+            { id: 'new',      label: 'Create new' },
+            { id: 'list',     label: 'View my TDs' }
+          ]
+        });
+
+        switch (res) {
+          case 'continue':
+            // seguimos en modo actualización con el mismo ID ya cargado
+            this.tdService.setIsUpdate(true);
+            break;
+
+          case 'new':
+            this.nombreTD = 'Thing’s Name';
+            this.tdService.resetTD();
+            this.tdService.setIsUpdate(false);
+            this.tdService.setIdUpdate(-1);
+            break;
+
+          case 'list':
+            this.router.navigate(['/my-tds']);
+            break;
+
+          default:
+            // dismiss: no hacemos nada
+            break;
+        }
+      },
+      error: e => console.error('Error', e)
+    });
+  }
+
 }

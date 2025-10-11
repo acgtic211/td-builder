@@ -1,0 +1,101 @@
+/* ===== Tokens (usa los tuyos globales si ya existen) ===== */
+$z-modal: 10000;
+$panel: #ffffff;
+$border: #e5e7eb;
+$text-900: #101828;
+$text-700: #344054;
+$brand-600: #2f55d4;
+
+/* ===== Overlay + modal ===== */
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal; // asegura que tape la UI
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.45);
+  backdrop-filter: blur(1px);
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.98);
+  opacity: 0;
+  animation: modal-in .18s ease-out forwards;
+
+  max-width: 420px;
+  width: 92%;
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(16, 24, 40, 0.2);
+  padding: 20px 18px 16px;
+  z-index: $z-modal + 1;
+
+  h2 {
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $text-900;
+  }
+
+  /* Botón cerrar (esquina superior derecha) */
+  .cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 1px solid $border;
+    background: #fff;
+    cursor: pointer;
+    transition: background .15s ease, transform .12s ease, border-color .15s ease;
+
+    &:hover { background: #f8fafc; border-color: darken($border, 6%); transform: translateY(-1px); }
+    &:active { transform: translateY(0); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(47,85,212,.35); }
+  }
+
+  /* Botón Google */
+  .google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    width: 100%;
+    padding: .65rem 1rem;
+    border-radius: 10px;
+    border: 1px solid $border;
+    background: #fff;
+    color: $text-900;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(16,24,40,.06);
+    transition: background .15s ease, border-color .15s ease, transform .12s ease;
+
+    img {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    &:hover { background: #f8fafc; border-color: darken($border, 6%); transform: translateY(-1px); }
+    &:active { transform: translateY(0); }
+    &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(47,85,212,.35); }
+  }
+}
+
+/* ===== Animación ===== */
+@keyframes modal-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.98); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+

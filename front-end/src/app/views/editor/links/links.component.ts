@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { NgIf, NgFor, NgClass, NgSwitchCase, NgSwitch } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { atributosLink } from '../../../variables';
+import { atributosLink } from '../../../models/variables';
 
 @Component({
   selector: 'app-links',

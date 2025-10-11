@@ -1,5 +1,13 @@
 <div class="editor-view">
-  <h2>Thing Description Editor: {{nombreTD}}</h2>
+  <div class="editor-head">
+    <h2 *ngIf="!isUpdate">Thing Description Editor: {{ nombreTD }}</h2>
+    <h2 *ngIf="isUpdate">Updating Thing Description: {{ nombreTD }}</h2>
+
+    <button type="button" class="btn-ghost" (click)="toggleAll()">
+      <span *ngIf="!areAllOpen">▸ Expand all</span>
+      <span *ngIf="areAllOpen">▾ Collapse all</span>
+    </button>
+  </div>
 
   <!-- General Information section -->
   <details (toggle)="onToggleGeneral($event)" [open]="generalAbierto">
@@ -217,13 +225,15 @@
   </details>
 
   <div class="buttons">
+    <button *ngIf="isUpdate" (click)="createNew()">🆕 Create New</button>
     <button (click)="abrirArchivo()">🗂️ Open TD</button>
     <button (click)="resetTD()">🧹 Clear TD</button>
     <input type="file" accept=".json"
          #inputArchivo
          (change)="cargarArchivoTD($event)"
          style="display: none;" />
-    <button *ngIf="user">💾 Save TD</button>
+    <button *ngIf="loggedIn && !isUpdate" (click)="guardarTD()">💾 Save TD</button>
+    <button *ngIf="isUpdate" (click)="updateTD()">🔄 Update TD</button>
     <button (click)="descargarTD()">⬇️ Download TD</button>
   </div>
 </div>

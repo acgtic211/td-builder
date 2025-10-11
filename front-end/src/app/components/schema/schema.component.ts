@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { atributosSchema, TipoSchema, Tipo, tiposSchema } from '../../variables';
+import { atributosSchema, TipoSchema, Tipo, tiposSchema } from '../../models/variables';
 
 @Component({
   selector: 'app-schema',

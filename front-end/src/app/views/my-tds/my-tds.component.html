@@ -1,0 +1,70 @@
+<div class="my-tds-view">
+  <header class="head">
+    <div class="head-left">
+      <h1>Mis Thing Descriptions</h1>
+      <span class="pill" *ngIf="!loading() && !error()">{{ tds().length }} TDs</span>
+    </div>
+
+    <div class="head-right">
+      <!-- 🔽 Descargar todo -->
+      <button
+        class="btn-download-all"
+        type="button"
+        (click)="downloadAll()"
+        [disabled]="loading() || !!error() || !tds().length"
+        title="Descargar todas las TDs como ZIP"
+        aria-label="Descargar todas las TDs"
+      >
+        ⬇️ Download all
+      </button>
+
+      <!-- 🔎 Buscador -->
+      <form class="search" (submit)="onSearchSubmit($event)">
+        <span class="icon" aria-hidden="true">🔎</span>
+        <input
+          type="search"
+          placeholder="Search by name…"
+          [value]="term()"
+          (input)="onSearchInput($event)"
+          aria-label="Buscar por nombre"
+        />
+      </form>
+    </div>
+  </header>
+
+  <div class="state" *ngIf="loading()">Loading…</div>
+  <div class="state error" *ngIf="error()">{{ error() }}</div>
+  <div class="state" *ngIf="!loading() && !error() && tds().length === 0">Not found.</div>
+
+  <ul class="grid" *ngIf="!loading() && !error() && tds().length">
+    <li class="card"
+        *ngFor="let item of tds()"
+        (click)="openEditor(item)"
+        tabindex="0"
+        role="button">
+      
+      <!-- botón borrar -->
+      <button class="card-del"
+              type="button"
+              aria-label="Borrar TD"
+              title="Borrar TD"
+              (click)="deleteTd(item, $event)">
+        🗑️
+      </button>
+
+      <div class="name">{{ item.name || '(sin nombre)' }}</div>
+      <div class="stats">
+        <div>propiedades: <strong>{{ countProperties(item.td) }}</strong></div>
+        <div>acciones: <strong>{{ countActions(item.td) }}</strong></div>
+        <div>eventos: <strong>{{ countEvents(item.td) }}</strong></div>
+        <div>links: <strong>{{ countLinks(item.td) }}</strong></div>
+      </div>
+      <div class="hint">Abrir en editor →</div>
+    </li>
+  </ul>
+
+  <div class="buttons">
+    <button (click)="logOut()">🚪 Log Out</button>
+  </div>
+  
+</div>
