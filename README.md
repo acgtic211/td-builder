@@ -1,4 +1,4 @@
-# 🌐 TDBuilder
+# TDBuilder
 
 **TDBuilder** is a graphical tool designed to simplify the creation, editing, and visualization of Thing Descriptions (TDs) for cyber-physical systems, following the [W3C Web of Things (WoT)](https://www.w3.org/WoT/) standard.
 
@@ -6,7 +6,7 @@ This tool reduces the learning curve for working with TDs by enabling users to i
 
 ---
 
-## 🚀 Features
+## Features
 
 - Visually create and edit **Thing Descriptions**.
 - Expand and collapse JSON structures dynamically.
@@ -20,7 +20,7 @@ This tool reduces the learning curve for working with TDs by enabling users to i
 
 ---
 
-## 🧱 Architecture
+## Architecture
 
 - **Frontend:** Angular built app served by **Nginx** → http://localhost
 - **Backend:** Spring Boot (Temurin JDK 17) → http://localhost:8080/api
@@ -33,7 +33,7 @@ Other routes are denied by default.
 ---
 
 
-## 🛠 How to Use
+## How to Use
 
 ### 1. Clone the repository
 
@@ -64,7 +64,7 @@ http://localhost
 
 ---
 
-## 📦 Requirements
+## Requirements
 
 - Docker  
 - Docker Compose  
@@ -72,19 +72,19 @@ http://localhost
 
 ---
 
-## 📄 License
+## License
 
 MIT License
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Pull requests are welcome!  
 For major changes, please open an issue first to discuss your ideas.
 
 ---
 
-## 💬 Contact
+## Contact
 
 For questions or feedback, feel free to open an issue on the repository.
