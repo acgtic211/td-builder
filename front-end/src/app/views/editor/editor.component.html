@@ -225,15 +225,15 @@
   </details>
 
   <div class="buttons">
-    <button *ngIf="isUpdate" (click)="createNew()">🆕 Create New</button>
-    <button (click)="abrirArchivo()">🗂️ Open TD</button>
+    <button *ngIf="isUpdate" (click)="createNew()">Create New</button>
+    <button (click)="abrirArchivo()">Open TD</button>
     <button (click)="resetTD()">🧹 Clear TD</button>
     <input type="file" accept=".json"
          #inputArchivo
          (change)="cargarArchivoTD($event)"
          style="display: none;" />
-    <button *ngIf="loggedIn && !isUpdate" (click)="guardarTD()">💾 Save TD</button>
-    <button *ngIf="isUpdate" (click)="updateTD()">🔄 Update TD</button>
-    <button (click)="descargarTD()">⬇️ Download TD</button>
+    <button *ngIf="loggedIn && !isUpdate" (click)="guardarTD()">Save TD</button>
+    <button *ngIf="isUpdate" (click)="updateTD()">Update TD</button>
+    <button (click)="descargarTD()">Download TD</button>
   </div>
 </div>
