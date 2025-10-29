@@ -1,0 +1,61 @@
+<div class="chat-shell" role="dialog" aria-label="Asistente TD Builder" aria-modal="false">
+  <header class="chat-header">
+
+    <div class="modes" role="tablist" aria-label="Modo de conversación">
+      <button
+        role="tab"
+        [attr.aria-selected]="mode==='faq'"
+        [ngClass]="{active: mode==='faq'}"
+        (click)="setMode('faq')">
+        FAQ
+      </button>
+
+      <button
+        role="tab"
+        [attr.aria-selected]="mode==='td'"
+        [ngClass]="{active: mode==='td'}"
+        (click)="setMode('td')">
+        Generate TD
+      </button>
+    </div>
+  </header>
+
+  <section class="messages" id="messages" aria-live="polite">
+    <div *ngFor="let m of messages()"
+         [ngClass]="{'bubble': true, 'user': m.role==='user', 'assistant': m.role==='assistant'}">
+      <div class="meta">
+        <span class="role">{{ m.role === 'user' ? 'Tú' : 'Asistente' }}</span>
+        <span class="mode">• {{ m.mode.toUpperCase() }}</span>
+      </div>
+
+      <pre class="content" *ngIf="m.mode==='faq' || !m.tdJson">{{ m.content }}</pre>
+
+      <ng-container *ngIf="m.mode==='td' && m.tdJson">
+        <div class="td-head">
+          <span>Thing Description</span>
+          <div class="td-actions">
+            <button type="button" (click)="copyJson(m.tdJson)" title="Copiar TD como JSON">
+              Copiar JSON
+            </button>
+          </div>
+        </div>
+        <pre class="json">{{ asJson(m.tdJson) | json }}</pre>
+      </ng-container>
+    </div>
+
+    <div class="loading" *ngIf="loading()">Generando respuesta…</div>
+    <div class="error" *ngIf="error()">{{ error() }}</div>
+  </section>
+
+  <footer class="composer">
+    <input
+      [(ngModel)]="msg"
+      [placeholder]="mode==='faq' ? 'Ask a question about the application…' : 'Describe the TD you want to generate…'"
+      (keyup.enter)="send()"
+      [disabled]="loading()"
+      autocomplete="off"
+      aria-label="Escribe tu mensaje"
+    />
+    <button type="button" (click)="send()">Enviar</button>
+  </footer>
+</div>

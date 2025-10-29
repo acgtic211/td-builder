@@ -75,6 +75,14 @@ export class SchemaComponent implements OnInit {
 
   seleccionarTipo(tipo: string) {
     const seleccionado = tiposSchema.find(t => t.nombre.toLowerCase() === tipo.toLowerCase());
+
+    if (seleccionado && this.typeSelected.nombre === seleccionado.nombre) {
+      this.typeSelected = { nombre: '', schema: TipoSchema.COMUN };
+      delete this.datos['type'];
+      this.emitirCambios();
+      return;
+    }
+
     if (seleccionado) {
       this.typeSelected = seleccionado;
 

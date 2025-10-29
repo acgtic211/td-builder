@@ -15,7 +15,7 @@ export class TdService {
   }
 
   // === Configuración / Persistencia ===
-  private apiUrl = environment.apiBase; // URL to web api
+  private apiUrl = environment.apiBase + '/save'; // URL to web api
   private STORAGE_KEY = 'tdb:editor:v1';
   private persistTimer: any;
 

@@ -4,6 +4,7 @@ import { LoginComponent } from '../../views/login/login.component';
 import { NgIf } from '@angular/common';
 import { AuthGoogleService } from '../../services/auth-google.service';
 import { Subscription } from 'rxjs';
+import { ChatUiService } from '../../chatbot/service/chat-ui.service';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +14,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  constructor(private authGoogleService: AuthGoogleService, private router: Router) { }
+  constructor(private authGoogleService: AuthGoogleService, private router: Router, public chatUi: ChatUiService) { }
    
   loggedIn: boolean = false;
   private sub?: Subscription;

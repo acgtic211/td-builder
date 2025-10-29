@@ -1,0 +1,14 @@
+<div class="chat-floater" *ngIf="ui.visible()" role="dialog" aria-label="Asistente TD Builder">
+    <div class="chat-popup">
+    <header class="popup-header">
+      <div class="logo-container">
+        <img [src]=rutaLogo alt="Logo ChatWot" class="logo"/>
+        <span>ChatWot</span>
+      </div>
+      
+      <button class="close-btn" (click)="closePopup()">✕</button>
+    </header>
+
+    <app-chat-inner></app-chat-inner>
+  </div>
+</div>

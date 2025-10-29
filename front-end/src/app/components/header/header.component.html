@@ -1,9 +1,15 @@
 <header class="header">
   <div class="title">TDBUILDER</div>
 
-  <button class="profile-btn" aria-label="Perfil" (click)="openLogin()">
-    <img [src]= "rutaImagenPerfil" alt="Perfil" (error)="onImgError($event)" referrerpolicy="no-referrer"/>
-  </button>
+  <div class="buttons">
+    <button class="chat-toggle" (click)="chatUi.toggle()">
+      Chat
+    </button>
+
+    <button class="profile-btn" aria-label="Perfil" (click)="openLogin()">
+      <img [src]= "rutaImagenPerfil" alt="Perfil" (error)="onImgError($event)" referrerpolicy="no-referrer"/>
+    </button>
+  </div>
 </header>
 
 <app-login *ngIf="mostrarLogin" (cerrar)="closeLogin()"></app-login>

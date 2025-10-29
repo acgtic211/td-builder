@@ -6,7 +6,7 @@ import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGoogleService {
-  private apiUrl = environment.apiBase; // URL to web api
+  private apiUrl = environment.apiBase + '/save'; // URL to web api
 
   private _loggedIn = new BehaviorSubject<boolean>(false);
   readonly loggedIn$ = this._loggedIn.asObservable();
@@ -79,7 +79,7 @@ export class AuthGoogleService {
         tap(() => console.log('Usuario registrado/ya existente')),
         catchError((err) => {
           console.error('Error registrando usuario', err);
-          //this.logout(); // forzar logout si hay error
+          this.logout(); // forzar logout si hay error
           return EMPTY;
         })
       )

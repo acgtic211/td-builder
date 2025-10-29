@@ -100,6 +100,15 @@ export class PropiedadComponent implements OnInit {
 
   seleccionarTipo(nombreTipo: string) {
     const seleccionado = this.tipos.find(t => t.nombre === nombreTipo);
+    
+    if (seleccionado && this.typeSelected.nombre === seleccionado.nombre) {
+      this.typeSelected = { nombre: '', schema: TipoSchema.COMUN };
+      delete this.datos['type']; 
+      this.actualizarAtributos();
+      this.emitirCambios();
+      return;
+    }
+
     if (seleccionado) {
       this.typeSelected = seleccionado;
       this.datos['type'] = seleccionado.nombre.toLowerCase();
@@ -107,7 +116,7 @@ export class PropiedadComponent implements OnInit {
       // ❗ Filtrar atributos que ya no sean válidos para el nuevo tipo
       const compatibles = new Set(
         atributosInteracciones
-          .filter(attr => attr.interaccion === Interaccion.PROPIEDAD)
+          .filter(attr => attr.interaccion === Interaccion.PROPIEDAD || attr.interaccion === Interaccion.COMUN)
           .map(attr => attr.nombre)
           .concat(
             atributosSchema
