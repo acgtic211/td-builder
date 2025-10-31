@@ -7,6 +7,7 @@ import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.Resource;
 
 @Service
 public class FaqService {
@@ -18,11 +19,11 @@ public class FaqService {
   public FaqService(
       Client client,
       @Value("${gemini.model.faq:gemini-2.5-flash}") String model,
-      @Value("${chat.app.context:Eres el asistente del TFG TD-Builder. Responde en Markdown de forma clara y breve.}") String systemPrompt
+      @Value("classpath:prompts/faqPrompt.txt") Resource promptFile
   ) {
     this.client = client;
     this.model = model;
-    this.systemPrompt = systemPrompt;
+    this.systemPrompt = new String(promptFile.getInputStream().readAllBytes());
   }
 
   /** Genera una respuesta de FAQ en texto (sin mantener historial). */
