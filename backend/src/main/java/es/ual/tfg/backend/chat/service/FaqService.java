@@ -20,7 +20,7 @@ public class FaqService {
       Client client,
       @Value("${gemini.model.faq:gemini-2.5-flash}") String model,
       @Value("classpath:prompts/faqPrompt.txt") Resource promptFile
-  ) {
+  ) throws Exception {
     this.client = client;
     this.model = model;
     this.systemPrompt = new String(promptFile.getInputStream().readAllBytes());

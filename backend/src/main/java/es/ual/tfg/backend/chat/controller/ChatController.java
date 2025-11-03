@@ -2,8 +2,8 @@ package es.ual.tfg.backend.chat.controller;
 
 import es.ual.tfg.backend.chat.service.FaqService;
 
-import es.ual.tfg.backend.chat.DTO.ChatRequest;
-import es.ual.tfg.backend.chat.DTO.ChatResponse;
+import es.ual.tfg.backend.chat.DTO.FaqRequest;
+import es.ual.tfg.backend.chat.DTO.FaqResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,9 +19,9 @@ public class ChatController {
   }
 
   @PostMapping("/faq")
-  public ChatResponse chat(@RequestBody ChatRequest req) {
+  public ChatResponse chat(@RequestBody FaqRequest req) {
     try {
-      var out = new ChatResponse();
+      var out = new FaqResponse();
       faq.answer(req.message); 
       return out;
     } catch (Exception e) {
