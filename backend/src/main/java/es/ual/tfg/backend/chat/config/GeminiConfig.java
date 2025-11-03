@@ -12,7 +12,7 @@ public class GeminiConfig {
 
   @Bean
   public Client genaiClient(
-      @Value("ApiKEy") String apiKey,
+      @Value("AIzaSyCMF8_SSIZGtSDzYBIV9_xsbQVq-6bC8HA") String apiKey,
       @Value("https://generativelanguage.googleapis.com") String baseUrl
   ) {
     // Forzamos Developer API (no Vertex) fijando el base URL del Gemini API

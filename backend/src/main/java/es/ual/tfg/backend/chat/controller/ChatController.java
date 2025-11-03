@@ -19,10 +19,10 @@ public class ChatController {
   }
 
   @PostMapping("/faq")
-  public ChatResponse chat(@RequestBody FaqRequest req) {
+  public FaqResponse chat(@RequestBody FaqRequest req) {
     try {
       var out = new FaqResponse();
-      faq.answer(req.message); 
+      out.text = faq.answer(req.message); 
       return out;
     } catch (Exception e) {
       throw new ResponseStatusException(

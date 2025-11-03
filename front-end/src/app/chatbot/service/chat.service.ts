@@ -23,7 +23,7 @@ export class ChatService {
   constructor(private http: HttpClient) {}
 
   send(message: string, mode: ChatMode): Observable<ChatResponse> {
-    const url = `${this.apiUrl}/ai/chat`;
+    const url = `${this.apiUrl}/ai/faq`;
 
     return this.http.post<ChatResponse>(url, { message, mode });
   }
