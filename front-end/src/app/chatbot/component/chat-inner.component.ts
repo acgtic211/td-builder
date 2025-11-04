@@ -32,16 +32,18 @@ export class ChatInnerComponent {
     const text = this.msg?.trim();
     if (!text || this.loading()) return;
     this.error.set(null);
+    
+    const currentMode = this.mode;
 
     // push user message
     const mUser: ChatMessage = {
-      id: uid(), role: 'user', content: text, mode: this.mode, createdAt: Date.now()
+      id: uid(), role: 'user', content: text, mode: currentMode, createdAt: Date.now()
     };
     this.messages.update(list => [...list, mUser]);
     this.msg = '';
     this.loading.set(true);
-
-    this.chat.send(text, this.mode).subscribe({
+    
+    this.chat.send(text, currentMode).subscribe({
       next: (res: ChatResponse) => {
         const content = res.mode === 'faq'
           ? (res.text || '(Sin respuesta)')
@@ -51,6 +53,7 @@ export class ChatInnerComponent {
           id: uid(), role: 'assistant', content, tdJson: res.json, mode: res.mode, createdAt: Date.now()
         };
         this.messages.update(list => [...list, mAssistant]);
+        queueMicrotask(() => document.getElementById('messages')?.scrollTo({ top: 1e9, behavior: 'smooth' }));
       },
       error: (err) => {
         console.error(err);
@@ -58,10 +61,6 @@ export class ChatInnerComponent {
       },
       complete: () => this.loading.set(false)
     });
-  }
-
-  copy(text: string) {
-    navigator.clipboard.writeText(text);
   }
 
   copyJson(obj: unknown) {

@@ -8,6 +8,5 @@ import org.springframework.data.repository.query.Param;
 import es.ual.tfg.backend.entity.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
-  @SuppressWarnings("null")
   Optional<User> findById(@Param("id") String id);
 }

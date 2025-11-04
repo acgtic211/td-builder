@@ -26,7 +26,7 @@ REQUISITOS ESTRICTOS:
    - Para properties numéricas: añade "unit" si aplica, y límites "minimum"/"maximum" si tiene sentido.
    - Para actions: si la invocación requiere entrada/salida, usa "input" y/o "output" (JSON Schema simples).
    - Para events: si el evento emite datos, usa "data" (JSON Schema simple).
-   - "forms": SIEMPRE incluye al menos una forma por affordance con:
+   - "forms": SIEMPRE incluye solo una forma por affordance con:
        {
          "href": "<URL absoluta o relativa basada en {{baseUrl}}>",
          "contentType": "application/json",
