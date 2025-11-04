@@ -16,7 +16,7 @@ function uid() { return Math.random().toString(36).slice(2); }
 })
 export class ChatInnerComponent {
   msg = '';
-  mode: ChatMode = 'faq'; // 'faq' | 'td'
+  mode: ChatMode = 'faq';
   loading = signal(false);
   error = signal<string | null>(null);
 
