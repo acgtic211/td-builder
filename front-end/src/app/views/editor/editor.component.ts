@@ -572,7 +572,7 @@ export class EditorComponent implements OnInit, OnDestroy{
     this.closeAllSections();
   }
 
-  guardarTD() {
+  createNewTD(){
     this.tdService.guardarTD(this.nombreTD).subscribe({
       next: async (createdId: number) => {
         const res = await this.dialog.open({
@@ -611,6 +611,13 @@ export class EditorComponent implements OnInit, OnDestroy{
       },
       error: e => console.error('Error', e)
     });
+  }
+
+  guardarTD() {
+    if(!this.isUpdate)
+      this.createNewTD();
+    else
+      this.updateTD();
   }
 
   createNew(){

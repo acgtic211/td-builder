@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ChatService } from './chat.service';
+import { GeminiService } from './gemini.service';
 
-describe('ChatService', () => {
-  let service: ChatService;
+describe('GeminiService', () => {
+  let service: GeminiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ChatService);
+    service = TestBed.inject(GeminiService);
   });
 
   it('should be created', () => {
