@@ -4,17 +4,17 @@
     <div class="modes" role="tablist" aria-label="Modo de conversación">
       <button
         role="tab"
-        [attr.aria-selected]="mode()==='faq'"
-        [ngClass]="{active: mode()==='faq'}"
-        (click)="setMode('faq')">
+        [attr.aria-selected]="mode()==='user-faq'"
+        [ngClass]="{active: mode()==='user-faq'}"
+        (click)="setMode('user-faq')">
         FAQ
       </button>
 
       <button
         role="tab"
-        [attr.aria-selected]="mode()==='td'"
-        [ngClass]="{active: mode()==='td'}"
-        (click)="setMode('td')">
+        [attr.aria-selected]="mode()==='user-generator'"
+        [ngClass]="{active: mode()==='user-generator'}"
+        (click)="setMode('user-generator')">
         Generate TD
       </button>
     </div>
@@ -23,23 +23,22 @@
   <!-- Mensajes -->
   <section #messageContainer class="messages" id="messages" aria-live="polite">
     <div *ngFor="let m of messages()"
-         [ngClass]="{'bubble': true, 'user': m.author==='user', 'assistant': m.author==='bot'}">
+         [ngClass]="{'bubble': true, 'user': m.author==='user-faq' || m.author==='user-generator', 'assistant': m.author==='bot'}">
       <div class="meta">
-        <span class="role">{{ m.author === 'user' ? 'Tú' : 'Asistente' }}</span>
-        <!-- Mantengo el nodo .mode para no tocar tu CSS -->
-        <span class="mode">• {{ mode().toUpperCase() }}</span>
+        <span class="role">{{ (m.author === 'user-faq' || m.author === 'user-generator') ? 'Tú' : 'Asistente' }}</span>
+        <span class="mode">• {{ modeLabel(m) }}</span>
       </div>
 
-      <!-- FAQ u otro texto plano -->
-      <pre class="content" *ngIf="mode()==='faq' || !m['tdJson']" [innerHTML]="formatContent(m.content)"></pre>
+      <!-- Mensaje FAQ u otro texto plano -->
+      <markdown class="content" *ngIf="mode()==='user-faq' || !m['tdJson']" [innerHTML]="formatContent(m.content)">      </markdown>
 
-      <!-- Vista TD cuando corresponda -->
-      <ng-container *ngIf="mode()==='td' && m['tdJson']">
+      <!-- Mensaje de Generar TD  -->
+      <ng-container *ngIf="mode()==='user-generator' && m['tdJson']">
         <div class="td-head">
           <span>Thing Description</span>
           <div class="td-actions">
-            <button type="button" (click)="copyJson(m['tdJson'])" title="Copiar TD como JSON">
-              Copiar JSON
+            <button type="button" (click)="useTd(m['tdJson'])" aria-label="Put on the Editor">
+              See on Editor
             </button>
           </div>
         </div>
@@ -48,7 +47,14 @@
     </div>
 
     <!-- Indicadores de estado usando tus clases -->
-    <div class="loading" *ngIf="isLoading()">Generando respuesta…</div>
+    <!-- <div class="loading" *ngIf="isLoading()">Thinking...</div> -->
+    <div class="chat-message bot" *ngIf="isLoading()">
+      <div class="bubble bot typing-indicator">
+        <p>Thinking</p>
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
     <div class="error" *ngIf="error()">{{ error() }}</div>
   </section>
 
@@ -57,7 +63,7 @@
     <input
       [ngModel]="userInput()"
       (ngModelChange)="userInput.set($event)"
-      [placeholder]="mode()==='faq' ? 'Ask a question about the application…' : 'Describe the TD you want to generate…'"
+      [placeholder]="mode()==='user-faq' ? 'Ask a question about the application…' : 'Describe the TD you want to generate…'"
       (keyup.enter)="sendMessage()"
       [disabled]="isLoading()"
       autocomplete="off"

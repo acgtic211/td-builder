@@ -1,13 +1,15 @@
-<app-header></app-header>
+<header>
+  <app-header></app-header>
+</header>
 
-<app-chatbot></app-chatbot>
-
-<div class="main-container">
+<main>
   <app-navigator></app-navigator>
 
-  <div class="view-container">
+  <div class="view">
     <router-outlet></router-outlet>
   </div>
-</div>
 
-<app-dialog-host></app-dialog-host>
+  <app-chatbot></app-chatbot>
+  <app-dialog-host></app-dialog-host>
+</main>
+

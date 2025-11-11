@@ -213,7 +213,21 @@ export class TdService {
     return ordenado;
   }
 
-  //Métodos para persistencia local (localStorage)
+  setFromJson(td: any, name: string = 'TD desde chat'): void {
+    if (!td || typeof td !== 'object') return;
+
+    // saneos mínimos por si el generador omitiera estos campos
+    if (!td['@context']) td['@context'] = 'https://www.w3.org/2019/wot/td/v1';
+    if (!td.security) td.security = 'nosec_sc';
+    if (!td.securityDefinitions) td.securityDefinitions = { nosec_sc: { scheme: 'nosec' } };
+
+    this.name = name;
+    // clonar para evitar referencias compartidas
+    this.td = JSON.parse(JSON.stringify(td));
+    this.touch();
+  }
+
+  //Métodos para persistencia local (sessionStorage)
   /** Guarda el estado con un pequeño debounce para no machacar el storage en cada tecla */
   private touch() {
     clearTimeout(this.persistTimer);

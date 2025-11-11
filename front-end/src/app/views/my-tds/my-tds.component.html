@@ -6,7 +6,7 @@
     </div>
 
     <div class="head-right">
-      <!-- 🔽 Descargar todo -->
+      <!--  Descargar todo -->
       <button
         class="btn-download-all"
         type="button"
@@ -15,18 +15,17 @@
         title="Descargar todas las TDs como ZIP"
         aria-label="Descargar todas las TDs"
       >
-        ⬇️ Download all
+        Download all
       </button>
 
-      <!-- 🔎 Buscador -->
       <form class="search" (submit)="onSearchSubmit($event)">
-        <span class="icon" aria-hidden="true">🔎</span>
+        <button class="icon" aria-hidden="true" aria-label="Buscar"><img [src]="rutaImagenLupa" alt="Botón de búsqueda"></button>
         <input
           type="search"
           placeholder="Search by name…"
           [value]="term()"
           (input)="onSearchInput($event)"
-          aria-label="Buscar por nombre"
+          aria-label="Escribir para buscar por nombre"
         />
       </form>
     </div>
@@ -44,12 +43,8 @@
         role="button">
       
       <!-- botón borrar -->
-      <button class="card-del"
-              type="button"
-              aria-label="Borrar TD"
-              title="Borrar TD"
-              (click)="deleteTd(item, $event)">
-        🗑️
+      <button class="card-del" type="button" aria-label="Borrar TD" (click)="deleteTd(item, $event)">
+        <img [src]="rutaImagenBasura" alt="Eliminar" class="trash">
       </button>
 
       <div class="name">{{ item.name || '(sin nombre)' }}</div>

@@ -20,6 +20,9 @@ import JSZip from 'jszip';
 export class MyTdsComponent  implements OnInit, OnDestroy{
   constructor(private authGoogleService: AuthGoogleService, private tdService: TdService, private router: Router, private dialog: DialogService) { }
 
+  rutaImagenLupa: string = 'assets/lupa.jpg'
+  rutaImagenBasura: string = 'assets/trash.png'
+
   loggedIn: boolean = false;
   private sub?: Subscription;
   private userId!: string;
