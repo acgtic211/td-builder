@@ -4,7 +4,6 @@ import { NgIf, NgFor, NgClass, JsonPipe, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../service/gemini.service';
 import { TdService } from '../../services/td.service';
-import { seguridadMap } from '../../models/variables';
 
 interface Message {
   author: 'user-faq' | 'bot' | 'user-generator';
@@ -67,10 +66,13 @@ export class ChatInnerComponent {
         if (parsed?.mode === 'user-faq' || parsed?.mode === 'user-generator') this.mode.set(parsed.mode);
       }
     } catch {}
+
+    this.scrollToBottomAfterRender();
   }
 
   async sendMessage(): Promise<void> {
     const userMessage = this.userInput().trim();
+    const messageMode = this.mode();
     if (!userMessage || this.isLoading()) return;
 
     let mode = this.mode();
@@ -82,7 +84,7 @@ export class ChatInnerComponent {
     this.scrollToBottomAfterRender();
 
     try {
-      const botResponse = await this.geminiService.getChatResponse(userMessage);
+      const botResponse = await this.geminiService.getChatResponse(userMessage, messageMode);
 
       if (mode === 'user-generator') {
         let td: unknown | null = null;
@@ -110,7 +112,7 @@ export class ChatInnerComponent {
     try {
       const anyTd = td as any;
       const name = anyTd?.title || 'TD desde chat';
-      this.tdService.setFromJson(anyTd, name);   // método añadido abajo en TdService
+      this.tdService.setFromJson(anyTd, name);
       alert('TD enviada al editor.');
     } catch (e) {
       console.error(e);

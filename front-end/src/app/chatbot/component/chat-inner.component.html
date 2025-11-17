@@ -23,21 +23,31 @@
   <!-- Mensajes -->
   <section #messageContainer class="messages" id="messages" aria-live="polite">
     <div *ngFor="let m of messages()"
-         [ngClass]="{'bubble': true, 'user': m.author==='user-faq' || m.author==='user-generator', 'assistant': m.author==='bot'}">
+         [ngClass]="{
+            'bubble': true,
+            'user': m.author==='user-faq' || m.author==='user-generator',
+            'assistant': m.author==='bot'
+         }">
+
       <div class="meta">
         <span class="role">{{ (m.author === 'user-faq' || m.author === 'user-generator') ? 'Tú' : 'Asistente' }}</span>
         <span class="mode">• {{ modeLabel(m) }}</span>
       </div>
 
       <!-- Mensaje FAQ u otro texto plano -->
-      <markdown class="content" *ngIf="mode()==='user-faq' || !m['tdJson']" [innerHTML]="formatContent(m.content)">      </markdown>
+      <markdown class="content"
+                *ngIf="m.author === 'user-faq' || !m['tdJson']" 
+                [innerHTML]="formatContent(m.content)">      
+      </markdown>
 
       <!-- Mensaje de Generar TD  -->
-      <ng-container *ngIf="mode()==='user-generator' && m['tdJson']">
+      <ng-container *ngIf="m['tdJson']">
         <div class="td-head">
           <span>Thing Description</span>
           <div class="td-actions">
-            <button type="button" (click)="useTd(m['tdJson'])" aria-label="Put on the Editor">
+            <button type="button"
+                    (click)="useTd(m['tdJson'])"
+                    aria-label="Put on the Editor">
               See on Editor
             </button>
           </div>
@@ -48,10 +58,12 @@
 
     <!-- Indicadores de estado usando tus clases -->
     <!-- <div class="loading" *ngIf="isLoading()">Thinking...</div> -->
-    <div class="chat-message bot" *ngIf="isLoading()">
-      <div class="bubble bot typing-indicator">
+    <div class="bubble assistant typing-bubble" *ngIf="isLoading()">
+      <div class="cargando">
         <p>Thinking</p>
-        <span></span><span></span><span></span>
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
       </div>
     </div>
 

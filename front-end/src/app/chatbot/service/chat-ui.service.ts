@@ -2,7 +2,6 @@ import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ChatUiService {
-  // Controla si se muestra el popup
   visible = signal(false);
 
   toggle() {
