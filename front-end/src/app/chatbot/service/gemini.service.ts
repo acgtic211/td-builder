@@ -8,8 +8,8 @@ export class GeminiService {
   private http = inject(HttpClient);
 
   private ai = new GoogleGenAI({ apiKey: environment.geminiApiKey });
-  private modelFaq = 'gemini-2.0-flash';
-  private modelGen = 'gemini-2.5-flash';
+  private modelFaq = 'gemini-2.5-flash';
+  private modelGen = 'gemini-2.0-flash';
   private chatFaq: Chat | null = null;
   private chatGen: Chat | null = null;
 

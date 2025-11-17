@@ -1,9 +1,10 @@
-import { Component, signal, computed, effect, inject, output, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, signal, effect, inject, output, ViewChild, ElementRef } from '@angular/core';
 import { MarkdownModule } from 'ngx-markdown';
 import { NgIf, NgFor, NgClass, JsonPipe, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../service/gemini.service';
 import { TdService } from '../../services/td.service';
+import { DialogService } from '../../services/dialog.service';
 
 interface Message {
   author: 'user-faq' | 'bot' | 'user-generator';
@@ -23,6 +24,7 @@ export class ChatInnerComponent {
 
   private geminiService = inject(GeminiService);
   private tdService = inject(TdService);
+  private dialog = inject(DialogService);
 
   private STORAGE_KEY = 'tdb:chat:last15';
 
@@ -107,16 +109,16 @@ export class ChatInnerComponent {
     }
   }
 
-  useTd(td: unknown) {
+  async useTd(td: unknown) {
     if (!td || typeof td !== 'object') return;
     try {
       const anyTd = td as any;
       const name = anyTd?.title || 'TD desde chat';
       this.tdService.setFromJson(anyTd, name);
-      alert('TD enviada al editor.');
+      await this.dialog.info('TD enviada al editor', `La Thing Description "${name}" se ha cargado correctamente.`);
     } catch (e) {
       console.error(e);
-      alert('No se pudo enviar la TD al editor.');
+      await this.dialog.info('TD enviada al editor', `No se pudo enviar la TD al editor.`);
     }
   }
   

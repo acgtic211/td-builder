@@ -12,6 +12,14 @@ export class DialogService {
     });
   }
 
+  info(title: string, message: string, opts?: { okText?: string; dismissible?: boolean }): Promise<'ok'|'dismiss'> {
+    const actions: DialogAction[] = [
+      { id: 'ok', label: opts?.okText ?? 'OK', variant: 'primary' }
+    ];
+
+    return this.open({ title, message, actions, dismissible: opts?.dismissible ?? true }) as any;
+  }
+
   confirm(
     title: string,
     message: string,
