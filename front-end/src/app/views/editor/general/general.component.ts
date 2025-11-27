@@ -25,7 +25,7 @@ export class GeneralComponent implements OnChanges {
   selectedSeguridad = '';
   otroSeguridad = '';
 
-  tipos = ['Sensor', 'Actuador', 'Servicio', 'DataSet', 'Otro'];
+  tipos = ['Sensor', 'Actuator', 'Service', 'DataSet', 'Other'];
   
   opcionesSeguridad = Object.entries(seguridadMap).map(([key, value]) => ({
     nombreEsquema: key, 
@@ -42,8 +42,23 @@ export class GeneralComponent implements OnChanges {
       this.titulo = td.title || '';
       this.id = td.id || '';
       this.descripcion = td.description || '';
-      this.selectedTipo = td['@type'] || '';
-      this.otroTipo = this.selectedTipo && !this.tipos.includes(this.selectedTipo) ? this.selectedTipo : '';
+
+      const tipoTd = td['@type'] || '';
+
+      if (this.tipos.includes(tipoTd)) {
+        // El tipo del TD está en la lista => seleccionamos ese botón y vaciamos el input "Other"
+        this.selectedTipo = tipoTd;
+        this.otroTipo = '';
+      } else if (tipoTd) {
+        // El tipo del TD NO está en la lista => seleccionamos "Other" y ponemos el valor en el input
+        this.selectedTipo = 'Other';
+        this.otroTipo = tipoTd;
+      } else {
+        // No hay tipo definido
+        this.selectedTipo = '';
+        this.otroTipo = '';
+      }
+
       this.selectedSeguridad = (td.securityDefinitions && Object.keys(td.securityDefinitions)[0]) || '';
       this.otroSeguridad = this.selectedSeguridad &&
       !this.opcionesSeguridad.some(op => op.nombreEsquema === this.selectedSeguridad) ? this.selectedSeguridad : '';
@@ -72,14 +87,19 @@ export class GeneralComponent implements OnChanges {
   }
 
   seleccionarTipo(tipo: string) {
+    if(this.selectedTipo === tipo) {
+      this.selectedTipo = "";
+      this.tdService.actualizarTipo(this.selectedTipo);
+      return;
+    }
+
     this.selectedTipo = tipo;
-    const tipoFinal = tipo === 'Otro' ? this.otroTipo : tipo;
-    this.tdService.actualizarTipo(tipoFinal);
+    this.tdService.actualizarTipo(tipo);
   }
 
   onOtroTipoChange(nuevoTipo: string) {
     this.otroTipo = nuevoTipo;
-    if (this.selectedTipo === 'Otro') {
+    if (this.selectedTipo === 'Other') {
       this.tdService.actualizarTipo(nuevoTipo);
     }
   }

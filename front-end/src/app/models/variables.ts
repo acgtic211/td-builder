@@ -285,10 +285,13 @@ export const tiposSchema: Tipo[] = [
 
 export const seguridadMap: { [clave: string]: string } = {
   'nosec_sc': 'nosec',
+  'auto_sc': 'auto',
   'basic_sc': 'basic',
-  'oauth2_sc': 'oauth2',
-  'cert_sc': 'cert',
-  'apikey_sc': 'apikey'
+  'digest_sc': 'digest',
+  'apikey_sc': 'apikey',
+  'bearer_sc': 'bearer',
+  'psk_sc': 'psk',
+  'oauth2_sc': 'oauth2'  
 };
   
   
