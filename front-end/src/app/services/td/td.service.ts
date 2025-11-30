@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, EMPTY, empty, map, Observable, of, tap, throwError } from 'rxjs';
-import { AuthGoogleService } from './auth-google.service';
-import { ThingDescriptionDto } from '../models/thing-description.model';
-import { environment } from '../environments/environment';
+import { AuthGoogleService } from '../auth/auth-google.service';
+import { ThingDescriptionDto } from '../../models/thing-description.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -269,53 +269,48 @@ export class TdService {
 
   //Métodos para interación con la API REST del backend
   guardarTD(nombre: string): Observable<any> {
-    const userId = this.authGoogleService.getUserId();
-
-    if (!userId) return throwError(() => new Error('Usuario no autenticado'));
-    if (!nombre || !nombre.trim()) return throwError(() => new Error('El nombre de la ThingDescription es obligatorio'));
- 
     const payload = { name: nombre.trim(), tdJson: this.generarTDOrdenado() };
-    const url = `${this.apiUrl}/${encodeURIComponent(userId)}/addThingDescriptions`;
+    const url = `${this.apiUrl}/thing-descriptions`;
 
     return this.http.post<ThingDescriptionDto>(url, payload, {
     ...this.httpOptions,
     observe: 'response' as const
-  }).pipe(
-    map(res => {
-      // 1) Preferir el body (tu back ya devuelve el objeto guardado con id)
-      const bodyId = res.body?.id;
-      if (bodyId != null) return bodyId;
-      throw new Error('No se pudo obtener el ID de la TD creada');
-    }),
-    catchError(err => {
-      console.error('Error guardando la TD', err);
-      return throwError(() => err);
-    })
-  );
+    }).pipe(
+      map(res => {
+        // 1) Preferir el body (tu back ya devuelve el objeto guardado con id)
+        const bodyId = res.body?.id;
+        if (bodyId != null) return bodyId;
+        throw new Error('No se pudo obtener el ID de la TD creada');
+      }),
+      catchError(err => {
+        console.error('Error guardando la TD', err);
+        return throwError(() => err);
+      })
+    );
   }
 
   updateTD(nombre: string): Observable<any> {
     if (!nombre || !nombre.trim()) return throwError(() => new Error('El nombre de la ThingDescription es obligatorio'));
 
     const payload = { name: nombre.trim(), tdJson: this.generarTDOrdenado() };
-    const url = `${this.apiUrl}/update/${encodeURIComponent(this.getIdUpdate())}`;
+    const url = `${this.apiUrl}/thing-descriptions/${encodeURIComponent(this.getIdUpdate())}`;
 
     return this.http.put<void>(url, payload, this.httpOptions)
   }
 
-  getUserTds(userId: string): Observable<ThingDescriptionDto[]> {
-    const url = `${this.apiUrl}/${encodeURIComponent(userId)}/getThingDescriptions`;
+  getUserTds(): Observable<ThingDescriptionDto[]> {
+    const url = `${this.apiUrl}/thing-descriptions`;
 
     return this.http.get<ThingDescriptionDto[]>(url, this.httpOptions);
   }
 
-  getOneUserTd(userId: string): Observable<ThingDescriptionDto> {
-    const url = `${this.apiUrl}/${encodeURIComponent(userId)}/td-${encodeURIComponent(userId)}`;
+  getOneUserTd(): Observable<ThingDescriptionDto> {
+    const url = `${this.apiUrl}/thing-descriptions/${encodeURIComponent(this.getIdUpdate())}`;
     return this.http.get<ThingDescriptionDto>(url, this.httpOptions);
   }
 
   deleteTd(id: number) {
-    const url = `${this.apiUrl}/delete-td/${id}`;
+    const url = `${this.apiUrl}/thing-descriptions/${id}`;
     return this.http.delete<void>(url, this.httpOptions);
   }
 

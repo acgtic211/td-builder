@@ -232,7 +232,7 @@
          #inputArchivo
          (change)="cargarArchivoTD($event)"
          style="display: none;" />
-    <button *ngIf="loggedIn" (click)="guardarTD()">Save TD</button>
+    <button *ngIf="(user$ | async)" (click)="guardarTD()">Save TD</button>
     <button (click)="descargarTD()">Download TD</button>
   </div>
 </div>

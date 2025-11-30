@@ -1,6 +1,6 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { NgIf, NgFor, NgClass } from '@angular/common';
-import { DialogService } from '../../services/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 
 @Component({
   selector: 'app-dialog-host',

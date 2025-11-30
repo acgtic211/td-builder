@@ -16,12 +16,17 @@ public class User {
     @Id
     private String id;
 
+    private String pictureUrl;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ThingDescription> thingDescriptions;
 
     public String getId(){ return this.id; }
     public void setId(String id) { this.id = id; }
+
+    public String getPictureUrl() { return this.pictureUrl; }
+    public void setPictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
 
     public List<ThingDescription> getThingDescriptions() { return thingDescriptions; }
     public void setThingDescriptions(List<ThingDescription> thingDescriptions) { this.thingDescriptions = thingDescriptions; }

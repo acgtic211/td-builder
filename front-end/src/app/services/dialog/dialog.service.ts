@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { DialogAction, DialogOptions, DialogResult } from '../models/dialog.types';
+import { DialogAction, DialogOptions, DialogResult } from '../../models/dialog.types';
 
 @Injectable({ providedIn: 'root' })
 export class DialogService {

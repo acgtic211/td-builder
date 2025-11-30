@@ -1,22 +1,22 @@
 import { Component, ElementRef, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
-import { DesplegablesService } from '../../services/desplegables.service';
-import { TdService } from '../../services/td.service';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { DesplegablesService } from '../../services/desplegables/desplegables.service';
+import { TdService } from '../../services/td/td.service';
 import { GeneralComponent } from './general/general.component';
 import { PropiedadComponent } from './propiedad/propiedad.component';
 import { AccionComponent } from './accion/accion.component';
 import { EventoComponent } from './evento/evento.component';
 import { LinksComponent } from './links/links.component';
 import { seguridadMap } from '../../models/variables';
-import { AuthGoogleService } from '../../services/auth-google.service';
+import { AuthGoogleService } from '../../services/auth/auth-google.service';
 import { Subscription } from 'rxjs';
-import { DialogService } from '../../services/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [NgIf, NgFor, GeneralComponent, PropiedadComponent, AccionComponent, EventoComponent, LinksComponent],
+  imports: [AsyncPipe, NgIf, NgFor, GeneralComponent, PropiedadComponent, AccionComponent, EventoComponent, LinksComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
@@ -49,17 +49,12 @@ export class EditorComponent implements OnInit, OnDestroy{
     ['general', 'propiedades', 'acciones', 'eventos', 'links'];
 
   constructor(public desplegables: DesplegablesService, public tdService: TdService, private authGoogleService: AuthGoogleService, private dialog: DialogService, private router: Router) {}
-  loggedIn: boolean = false;
-  private sub1?: Subscription;
+  user$ = this.authGoogleService.user$;
   isUpdate: boolean = false;
   private sub2?: Subscription;
 
   ngOnInit(): void {
     this.cargatTd();
-
-    this.sub1 = this.authGoogleService.loggedIn$.subscribe(estado => {
-      this.loggedIn = estado;
-    });
 
     this.sub2 = this.tdService.isUpdate$.subscribe(estado => {
       this.isUpdate = estado;
@@ -75,7 +70,6 @@ export class EditorComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
-    this.sub1?.unsubscribe();
     this.sub2?.unsubscribe();
   }
 

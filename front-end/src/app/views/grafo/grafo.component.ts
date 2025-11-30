@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
-import { TdService } from '../../services/td.service';
+import { TdService } from '../../services/td/td.service';
 import * as d3 from 'd3';
 
 // Tipo extendido para nodos jerárquicos

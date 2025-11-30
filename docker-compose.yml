@@ -1,18 +1,12 @@
 services:
-  # FRONTEND (Angular + Nginx)
-  tdbuilder:
-    build:
+  # PostgreSQL Database
+  postgres:
+    build: 
       context: .
-      dockerfile: front-end/Dockerfile
-    container_name: tdbuilder
-    ports:
-      - "80:80"
-    restart: unless-stopped
-    depends_on:
-      - backend
-    environment:
-      # Útil si tu build lee esta var para apuntar a /api
-      - API_BASE=/api
+      dockerfile: backend/DockerfileDatabase
+    container_name: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   # BACKEND (Spring Boot)
   backend:
@@ -20,42 +14,23 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: backend
-    restart: unless-stopped
-    environment:
-      # Override de Spring para DB (evitas tocar application.properties si no quieres)
-      SPRING_APPLICATION_NAME: backend
-      SERVER_SERVLET_CONTEXT_PATH: /api
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: pass
-      SPRING_JPA_PROPERTIES_HIBERNATE_TEMP_USE_JDBC_METADATA_DEFAULTS: "false"
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
-      SERVER_SERVLET_SESSION_COOKIE_HTTP_ONLY: "true"
-      SERVER_SERVLET_SESSION_COOKIE_SAME_SITE: Lax
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # DATABASE (Postgres)
-  postgres:
-    image: postgres:16-alpine
-    container_name: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
     ports:
-      - "5432:5432"   # opcional si quieres acceder desde host
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  # FRONTEND (Angular + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: front-end/Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
