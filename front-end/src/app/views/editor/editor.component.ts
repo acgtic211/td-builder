@@ -404,53 +404,44 @@ export class EditorComponent implements OnInit, OnDestroy{
   }
 
   async descargarTD() {
-    const nombreBase = this.nombreTD?.trim() || 'thing-description';
-    const nombreSeguro = nombreBase
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9\-]/gi, '');
-
-    const sugerido = `${nombreSeguro || 'thing-description'}.json`;
-    const td = this.tdService.obtenerTD();
-    const contenido = JSON.stringify(td, null, 2);
-    const blob = new Blob([contenido], { type: 'application/json' });
-
-    // 1) Intento con File System Access API (Chromium)
     try {
-      // feature detection
-      const anyWindow = window as any;
-      if (typeof anyWindow.showSaveFilePicker === 'function') {
-        const handle = await anyWindow.showSaveFilePicker({
-          suggestedName: sugerido,
-          types: [{
-            description: 'Thing Description (JSON)',
-            accept: { 'application/json': ['.json'] }
-          }]
-        });
-
-        const stream = await handle.createWritable();
-        await stream.write(blob);
-        await stream.close();
+      const td = this.tdService.obtenerTD();
+      if (!td) {
+        console.error('No hay TD para descargar');
         return;
       }
+
+      // Nombre base igual que antes
+      const nombreBase = this.nombreTD?.trim() || 'thing-description';
+      const nombreSeguro = nombreBase
+        .toLowerCase()
+        .replace(/\s+/g, '-')           // espacios por guiones
+        .replace(/[^a-z0-9\-]/gi, '');  // solo letras, números y guiones
+
+      const nombreArchivo = `${nombreSeguro || 'thing-description'}.json`;
+
+      // Crear el Blob con el contenido de la TD
+      const contenido = JSON.stringify(td, null, 2);
+      const blob = new Blob([contenido], { type: 'application/json' });
+
+      // Misma lógica que downloadImages: URL + <a download> + click
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = nombreArchivo;
+
+      document.body.appendChild(a);
+      a.click();
+
+      // Limpieza
+      window.URL.revokeObjectURL(url);
+      a.remove();
     } catch (err) {
-      // Si el usuario cancela, simplemente salimos sin error
-      console.warn('Guardado cancelado o error en showSaveFilePicker:', err);
-      return;
+      console.error('Error al descargar la TD:', err);
+      // Aquí si quieres puedes mostrar un toast o setear un estado de error
+      // this.mensajeError = 'Error al descargar la Thing Description.';
     }
-
-    // 2) Fallback universal (<a download>) – el navegador decide la carpeta
-    const nombre = prompt('Nombre del archivo', sugerido);
-    if (!nombre || !nombre.trim()) return;
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nombre.trim().endsWith('.json') ? nombre.trim() : `${nombre.trim()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   }
 
   abrirArchivo() {

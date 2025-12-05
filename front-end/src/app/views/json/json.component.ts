@@ -15,7 +15,7 @@ import { td_schema } from './tdSchema/td_schema';
 export class JsonComponent {
   @ViewChild('finalValidacion') finalValidacion!: ElementRef;
   
-  private ajv = new Ajv({ strict: false });
+  private ajv = new Ajv({ strict: false, allErrors: true });
   
   public errores: string[] = [];
 
