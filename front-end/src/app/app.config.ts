@@ -6,13 +6,11 @@ import { MarkdownModule, MARKED_OPTIONS } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideOAuthClient } from 'angular-oauth2-oidc';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes),
-    provideOAuthClient(),
     provideHttpClient(), 
     provideAnimationsAsync(),
     importProvidersFrom(MarkdownModule.forRoot()),

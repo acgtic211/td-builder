@@ -1,14 +1,15 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 
-import { AuthGoogleService } from '../../services/auth-google.service';
-import { TdService } from '../../services/td.service';
+import { AuthGoogleService } from '../../services/auth/auth-google.service';
+import { TdService } from '../../services/td/td.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { ThingDescriptionDto } from '../../models/thing-description.model';
 import { NgFor, NgIf } from '@angular/common';
 import { seguridadMap } from '../../models/variables';
-import { DialogService } from '../../services/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import JSZip from 'jszip';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-my-tds',
@@ -17,15 +18,14 @@ import JSZip from 'jszip';
   templateUrl: './my-tds.component.html',
   styleUrl: './my-tds.component.scss'
 })
-export class MyTdsComponent  implements OnInit, OnDestroy{
+export class MyTdsComponent  implements OnInit {
   constructor(private authGoogleService: AuthGoogleService, private tdService: TdService, private router: Router, private dialog: DialogService) { }
 
   rutaImagenLupa: string = 'assets/lupa.jpg'
   rutaImagenBasura: string = 'assets/trash.png'
+  private apiUrl = environment.apiBase + '/logout';
 
-  loggedIn: boolean = false;
-  private sub?: Subscription;
-  private userId!: string;
+  $user = this.authGoogleService.user$;
 
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
@@ -36,29 +36,14 @@ export class MyTdsComponent  implements OnInit, OnDestroy{
   private debounceId?: any;
 
   ngOnInit() {
-    this.sub = this.authGoogleService.loggedIn$.subscribe(estado => {
-      this.loggedIn = estado;
-    });
-
-    const uid = this.authGoogleService.getUserId();
-    if (!uid) {
-      this.loading.set(false);
-      this.error.set('No hay sesión iniciada.');
-      return;
-    }
-    this.userId = uid;
     this.loadUserTds();
-  }
-
-  ngOnDestroy() {
-    this.sub?.unsubscribe();
   }
 
   private loadUserTds(name?: string) {
     this.loading.set(true);
     const obs = name && name.trim()
-      ? this.tdService.searchTds(this.userId, name.trim()) // crea otro método
-      : this.tdService.getUserTds(this.userId);
+      ? this.tdService.searchTds("hola", name.trim()) // crea otro método
+      : this.tdService.getUserTds();
 
     obs.subscribe({
       next: rows => { this.tds.set(rows || []); this.loading.set(false); },
@@ -231,7 +216,8 @@ export class MyTdsComponent  implements OnInit, OnDestroy{
       okText: 'Yes', cancelText: 'No'
     });
     if (res === 'ok') {
-      this.authGoogleService.logout();
+      //this.authGoogleService.logout();
+      window.location.href = this.apiUrl;
       this.tdService.setIdUpdate(-1);
       this.tdService.setIsUpdate(false);
       this.router.navigateByUrl('/info');

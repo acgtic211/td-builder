@@ -3,8 +3,8 @@ import { MarkdownModule } from 'ngx-markdown';
 import { NgIf, NgFor, NgClass, JsonPipe, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeminiService } from '../service/gemini.service';
-import { TdService } from '../../services/td.service';
-import { DialogService } from '../../services/dialog.service';
+import { TdService } from '../../services/td/td.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 
 interface Message {
   author: 'user-faq' | 'bot' | 'user-generator';

@@ -1,22 +1,22 @@
 import { Component, ElementRef, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
-import { DesplegablesService } from '../../services/desplegables.service';
-import { TdService } from '../../services/td.service';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { DesplegablesService } from '../../services/desplegables/desplegables.service';
+import { TdService } from '../../services/td/td.service';
 import { GeneralComponent } from './general/general.component';
 import { PropiedadComponent } from './propiedad/propiedad.component';
 import { AccionComponent } from './accion/accion.component';
 import { EventoComponent } from './evento/evento.component';
 import { LinksComponent } from './links/links.component';
 import { seguridadMap } from '../../models/variables';
-import { AuthGoogleService } from '../../services/auth-google.service';
+import { AuthGoogleService } from '../../services/auth/auth-google.service';
 import { Subscription } from 'rxjs';
-import { DialogService } from '../../services/dialog.service';
+import { DialogService } from '../../services/dialog/dialog.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [NgIf, NgFor, GeneralComponent, PropiedadComponent, AccionComponent, EventoComponent, LinksComponent],
+  imports: [AsyncPipe, NgIf, NgFor, GeneralComponent, PropiedadComponent, AccionComponent, EventoComponent, LinksComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
@@ -49,17 +49,12 @@ export class EditorComponent implements OnInit, OnDestroy{
     ['general', 'propiedades', 'acciones', 'eventos', 'links'];
 
   constructor(public desplegables: DesplegablesService, public tdService: TdService, private authGoogleService: AuthGoogleService, private dialog: DialogService, private router: Router) {}
-  loggedIn: boolean = false;
-  private sub1?: Subscription;
+  user$ = this.authGoogleService.user$;
   isUpdate: boolean = false;
   private sub2?: Subscription;
 
   ngOnInit(): void {
     this.cargatTd();
-
-    this.sub1 = this.authGoogleService.loggedIn$.subscribe(estado => {
-      this.loggedIn = estado;
-    });
 
     this.sub2 = this.tdService.isUpdate$.subscribe(estado => {
       this.isUpdate = estado;
@@ -75,7 +70,6 @@ export class EditorComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
-    this.sub1?.unsubscribe();
     this.sub2?.unsubscribe();
   }
 
@@ -410,53 +404,44 @@ export class EditorComponent implements OnInit, OnDestroy{
   }
 
   async descargarTD() {
-    const nombreBase = this.nombreTD?.trim() || 'thing-description';
-    const nombreSeguro = nombreBase
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9\-]/gi, '');
-
-    const sugerido = `${nombreSeguro || 'thing-description'}.json`;
-    const td = this.tdService.obtenerTD();
-    const contenido = JSON.stringify(td, null, 2);
-    const blob = new Blob([contenido], { type: 'application/json' });
-
-    // 1) Intento con File System Access API (Chromium)
     try {
-      // feature detection
-      const anyWindow = window as any;
-      if (typeof anyWindow.showSaveFilePicker === 'function') {
-        const handle = await anyWindow.showSaveFilePicker({
-          suggestedName: sugerido,
-          types: [{
-            description: 'Thing Description (JSON)',
-            accept: { 'application/json': ['.json'] }
-          }]
-        });
-
-        const stream = await handle.createWritable();
-        await stream.write(blob);
-        await stream.close();
+      const td = this.tdService.obtenerTD();
+      if (!td) {
+        console.error('No hay TD para descargar');
         return;
       }
+
+      // Nombre base igual que antes
+      const nombreBase = this.nombreTD?.trim() || 'thing-description';
+      const nombreSeguro = nombreBase
+        .toLowerCase()
+        .replace(/\s+/g, '-')           // espacios por guiones
+        .replace(/[^a-z0-9\-]/gi, '');  // solo letras, números y guiones
+
+      const nombreArchivo = `${nombreSeguro || 'thing-description'}.json`;
+
+      // Crear el Blob con el contenido de la TD
+      const contenido = JSON.stringify(td, null, 2);
+      const blob = new Blob([contenido], { type: 'application/json' });
+
+      // Misma lógica que downloadImages: URL + <a download> + click
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = nombreArchivo;
+
+      document.body.appendChild(a);
+      a.click();
+
+      // Limpieza
+      window.URL.revokeObjectURL(url);
+      a.remove();
     } catch (err) {
-      // Si el usuario cancela, simplemente salimos sin error
-      console.warn('Guardado cancelado o error en showSaveFilePicker:', err);
-      return;
+      console.error('Error al descargar la TD:', err);
+      // Aquí si quieres puedes mostrar un toast o setear un estado de error
+      // this.mensajeError = 'Error al descargar la Thing Description.';
     }
-
-    // 2) Fallback universal (<a download>) – el navegador decide la carpeta
-    const nombre = prompt('Nombre del archivo', sugerido);
-    if (!nombre || !nombre.trim()) return;
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nombre.trim().endsWith('.json') ? nombre.trim() : `${nombre.trim()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   }
 
   abrirArchivo() {

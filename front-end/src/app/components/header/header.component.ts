@@ -1,42 +1,28 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginComponent } from '../../views/login/login.component';
-import { NgIf } from '@angular/common';
-import { AuthGoogleService } from '../../services/auth-google.service';
-import { Subscription } from 'rxjs';
+import { NgIf, AsyncPipe} from '@angular/common';
+import { AuthGoogleService } from '../../services/auth/auth-google.service';
 import { ChatUiService } from '../../chatbot/service/chat-ui.service';
+import { use } from 'marked';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [LoginComponent, NgIf],
+  imports: [LoginComponent, NgIf, AsyncPipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent {
   constructor(private authGoogleService: AuthGoogleService, private router: Router, public chatUi: ChatUiService) { }
    
-  loggedIn: boolean = false;
-  private sub?: Subscription;
+  user$ = this.authGoogleService.user$;
   
-  rutaImagenPerfil: string = 'assets/perfil.png'
+  rutaImagenPerfil: string = 'assets/perfil.png';
   mostrarLogin = false;
 
-  ngOnInit() {
-    this.sub = this.authGoogleService.loggedIn$.subscribe(estado => {
-      this.loggedIn = estado;
-      this.rutaImagenPerfil = estado
-      ? (this.authGoogleService.getPicture() || 'assets/perfil.png')
-      : 'assets/perfil.png';
-    });
-  }
-
-  ngOnDestroy() {
-    this.sub?.unsubscribe();
-  }
-
   openLogin(){
-    if (!this.loggedIn)
+    if (!this.authGoogleService.isLoggedIn)
       this.mostrarLogin = true;
     else
       this.router.navigateByUrl('/my-tds');    
@@ -44,10 +30,5 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   closeLogin() {
     this.mostrarLogin = false;
-  }
-
-  onImgError(ev: Event) {
-    console.log('Error al cargar la imagen de perfil, usando imagen por defecto.');
-    (ev.target as HTMLImageElement).src = 'assets/perfil.png';
   }
 }

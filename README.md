@@ -23,7 +23,7 @@ This tool reduces the learning curve for working with TDs by enabling users to i
 ## Architecture
 
 - **Frontend:** Angular built app served by **Nginx** → http://localhost
-- **Backend:** Spring Boot (Temurin JDK 17) → http://localhost:8080/api
+- **Backend:** Spring Boot (Temurin JDK 17) → http://localhost/api
 - **Database:** PostgreSQL (service name db)
 
 > All protected endpoints live under ```/api/save/**``` (authentication required).

@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { TdService } from '../../services/td.service';
+import { TdService } from '../../services/td/td.service';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import { td_schema } from './tdSchema/td_schema';
@@ -15,7 +15,7 @@ import { td_schema } from './tdSchema/td_schema';
 export class JsonComponent {
   @ViewChild('finalValidacion') finalValidacion!: ElementRef;
   
-  private ajv = new Ajv({ strict: false });
+  private ajv = new Ajv({ strict: false, allErrors: true });
   
   public errores: string[] = [];
 

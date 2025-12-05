@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { AuthGoogleService } from '../../services/auth-google.service';
+import { AuthGoogleService } from '../../services/auth/auth-google.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -9,12 +10,13 @@ import { AuthGoogleService } from '../../services/auth-google.service';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+  private apiUrl = environment.apiBase + '/login';
   @Output() cerrar = new EventEmitter<void>();
 
   constructor(private authGoogleService: AuthGoogleService) { }
 
   loginWithGoogle() {
-    this.authGoogleService.login();
+    window.location.href = this.apiUrl;
   }
 
   cerrarModal() {

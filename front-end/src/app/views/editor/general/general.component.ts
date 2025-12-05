@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { NgIf, NgFor, CommonModule} from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TdService } from '../../../services/td.service';
+import { TdService } from '../../../services/td/td.service';
 import { seguridadMap } from '../../../models/variables';
 
 @Component({

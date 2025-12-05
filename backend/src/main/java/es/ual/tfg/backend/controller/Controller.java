@@ -2,11 +2,12 @@ package es.ual.tfg.backend.controller;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.security.core.Authentication;
 
 import es.ual.tfg.backend.DTO.CreateThingDescriptionRequest;
 import es.ual.tfg.backend.entity.ThingDescription;
@@ -34,64 +37,78 @@ public class Controller {
   @Autowired
   ThingDescriptionRepository thingDescriptionRepository;
 
-   @PostMapping("/addUser")
-    public ResponseEntity<Void> createUser(@RequestBody Map<String, String> body) {
-      String userId = body.get("id");
-      if (userId == null || userId.isBlank()) {
-        return ResponseEntity.badRequest().build();
-      }
-      User aux = userRepository.findById(userId).orElse(null);
-      if (aux == null) {
-        aux = new User();
-        aux.setId(userId);
-        userRepository.save(aux);
-      }
-      return ResponseEntity.ok().build();
+  private User getCurrentUser(Authentication authentication) {
+    if (authentication == null || !authentication.isAuthenticated()) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado");
     }
 
-  @PostMapping("/{userId}/addThingDescriptions")
-  public ResponseEntity<ThingDescription> addThingDescriptionsToUser(@PathVariable String userId, @Valid @RequestBody CreateThingDescriptionRequest req) {
-      User user = userRepository.findById(userId).orElse(null);
-      if (user == null) return ResponseEntity.notFound().build();
+    if (!(authentication.getPrincipal() instanceof OAuth2User oauth2User)) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Tipo de autenticación no soportado");
+    }
 
-      var ent = new ThingDescription();
-      ent.setName(req.name());
-      ent.setTd(req.tdJson());     // mapeas explícitamente
-      ent.setOwner(user);
-      
-      var saved = thingDescriptionRepository.save(ent);
+    // Atributos que te da Google (name, email, sub, picture, etc.)
+    String id = oauth2User.getAttribute("sub");
+    if (id == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se ha podido obtener el id del usuario");
+    }
 
-      URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-      .path("/api/users/{userId}/thing-descriptions/{id}")
-      .buildAndExpand(userId, saved.getId())
-      .toUri();
-
-      return ResponseEntity.created(location).body(saved);
+    return userRepository.findById(id)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no registrado en la BD"));
   }
 
-  @PutMapping("/update/{id}")
-  public ResponseEntity<ThingDescription> updateTd(@PathVariable Long id, @Valid @RequestBody CreateThingDescriptionRequest req) {
-    Optional<ThingDescription> tdOpcional = thingDescriptionRepository.findById(id);
+  @PostMapping("/thing-descriptions")
+  public ResponseEntity<ThingDescription> addThingDescriptionsToCurrentUser(@Valid @RequestBody CreateThingDescriptionRequest req, Authentication authentication) {
+    User user = getCurrentUser(authentication);
+    if (user == null) return ResponseEntity.notFound().build();
+
+    ThingDescription  ent = new ThingDescription();
+    ent.setName(req.name());
+    ent.setTd(req.tdJson());
+    ent.setOwner(user);
     
-    if (tdOpcional.isPresent()) {
-        ThingDescription thingDescription = tdOpcional.get();
-        
-        // Actualizar el td
-        thingDescription.setName(req.name());
-        thingDescription.setTd(req.tdJson()); 
-        
-        // Guardar los cambios en la base de datos
-        thingDescriptionRepository.save(thingDescription);
+    ThingDescription  saved = thingDescriptionRepository.save(ent);
 
-        return ResponseEntity.ok(thingDescription);
-    } else {
-        return ResponseEntity.notFound().build();
-    }
+    URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+    .path("/api/thing-descriptions/{id}")
+    .buildAndExpand(saved.getId())
+    .toUri();
+
+    return ResponseEntity.created(location).body(saved);
   }
 
-  @GetMapping("/{userId}/getThingDescriptions")
-  public ResponseEntity<List<ThingDescription>> getThingDescriptionsFromUser(@PathVariable String userId) {
-      List<ThingDescription> list = thingDescriptionRepository.findAllByOwner_Id(userId);
+  @PutMapping("/thing-descriptions/{id}")
+  public ResponseEntity<ThingDescription> updateTd(@PathVariable Long id, @Valid @RequestBody CreateThingDescriptionRequest req, Authentication authentication) {
+    User currentUser = getCurrentUser(authentication);
+    if (currentUser == null) return ResponseEntity.notFound().build();
+
+    Optional<ThingDescription> tdOpcional = thingDescriptionRepository.findById(id);
+
+    if (tdOpcional.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    
+    ThingDescription thingDescription = tdOpcional.get();
+
+    if (!thingDescription.getOwner().getId().equals(currentUser.getId())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+    
+    // Actualizar el td
+    thingDescription.setName(req.name());
+    thingDescription.setTd(req.tdJson()); 
+    
+    // Guardar los cambios en la base de datos
+    ThingDescription updated = thingDescriptionRepository.save(thingDescription);
+
+    return ResponseEntity.ok(updated);
+  }
+
+  @GetMapping("/thing-descriptions")
+  public ResponseEntity<List<ThingDescription>> getThingDescriptionsFromCurrentUser(Authentication authentication) {
+      User currentUser = getCurrentUser(authentication);
+      if (currentUser == null) return ResponseEntity.notFound().build();
+
+      List<ThingDescription> list = thingDescriptionRepository.findAllByOwner_Id(currentUser.getId());
       return ResponseEntity.ok(list);
   }
 
@@ -104,14 +121,24 @@ public class Controller {
     return ResponseEntity.ok(list);
   }
 
-  @DeleteMapping("/delete-td/{thingDescriptionId}")
-  public ResponseEntity<Void> deleteTd(@PathVariable Long thingDescriptionId) {
+  @DeleteMapping("/thing-descriptions/{thingDescriptionId}")
+  public ResponseEntity<Void> deleteTd(@PathVariable Long thingDescriptionId, Authentication authentication) {
+    User currentUser = getCurrentUser(authentication);
+    if (currentUser == null) return ResponseEntity.notFound().build();
+    
     Optional<ThingDescription> thingDescriptionOptional = thingDescriptionRepository.findById(thingDescriptionId);
 
-    if (thingDescriptionOptional.isPresent()) {
-        thingDescriptionRepository.deleteById(thingDescriptionId);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content si el td se elimina con éxito
-    } else
-        return ResponseEntity.notFound().build(); // Retorna 404 Not Found si el td no se encuentra
+    if (thingDescriptionOptional.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+
+    ThingDescription td = thingDescriptionOptional.get();
+
+    if (!td.getOwner().getId().equals(currentUser.getId())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    thingDescriptionRepository.deleteById(thingDescriptionId);
+    return ResponseEntity.noContent().build();
   }
 }
