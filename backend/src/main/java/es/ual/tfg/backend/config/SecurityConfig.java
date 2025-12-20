@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,14 +33,18 @@ public class SecurityConfig {
     http
       .csrf(AbstractHttpConfigurer::disable)
       .cors(cors->cors.configurationSource(corsConfiguration()))
+      .requestCache(cache -> cache.requestCache(new NullRequestCache()))
+      .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+        response.setStatus(401);
+      }))
       .authorizeHttpRequests(auth -> {
-        auth.requestMatchers("/api").permitAll();
+        auth.requestMatchers("/", "/user-logged", "/logout", "/error", "/oauth2/**", "/login/**").permitAll();
         auth.anyRequest().authenticated();
       })
-      .oauth2Login(oauth2 -> {
-        oauth2.successHandler(oAuth2LoginSuccessHandler);
-        oauth2.failureHandler(new LoginFailureHandler());
-        oauth2.loginPage("/oauth2/authorization/google");
+      .oauth2Login(oauth2 -> { 
+        oauth2
+          .successHandler(oAuth2LoginSuccessHandler)
+          .failureHandler(new LoginFailureHandler());
       })
       .logout(logout -> logout
         .logoutUrl("/logout")             // URL de logout: /api/logout

@@ -32,21 +32,18 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
   
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-    OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
+    OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
 
-    if("google".equals(oAuth2AuthenticationToken.getAuthorizedClientRegistrationId())) {
-      DefaultOAuth2User principal = (DefaultOAuth2User) authentication.getPrincipal();
+    if("google".equals(token.getAuthorizedClientRegistrationId())) {
+      DefaultOAuth2User principal = (DefaultOAuth2User) token.getPrincipal();
       Map<String, Object> attributes = principal.getAttributes();
       
-      Object subObj = attributes.get("sub");
-
-      if (subObj == null) {
-          System.err.println("El atributo 'sub' es nulo");
-          response.sendRedirect("/error");
+      String sub = (String) attributes.get("sub");
+      if (sub == null) {
+          response.setStatus(500);
+          response.getWriter().write("Missing 'sub' claim from Google user");
           return;
       }
-
-      String sub = (String) subObj;
       
       String pictureUrl = (String) attributes.get("picture");
 
@@ -58,21 +55,8 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         user.setPictureUrl(pictureUrl);
 
         userService.saveUser(user);
-
-        DefaultOAuth2User newUserDetails = new DefaultOAuth2User(
-            Collections.emptyList(),  // No autoridades
-            attributes, "id");
-    
-        Authentication newAuth = new OAuth2AuthenticationToken(
-            newUserDetails, 
-            Collections.emptyList(),  // No autoridades
-            oAuth2AuthenticationToken.getAuthorizedClientRegistrationId());
-
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
       }
     }
-    this.setAlwaysUseDefaultTargetUrl(true);
-    this.setDefaultTargetUrl(frontendUrl);
-    super.onAuthenticationSuccess(request, response, authentication);
+    response.sendRedirect(frontendUrl);
   }
 }

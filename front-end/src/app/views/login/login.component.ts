@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  private apiUrl = environment.apiBase + '/login';
+  private apiUrl = environment.apiBase + '/oauth2/authorization/google';
   @Output() cerrar = new EventEmitter<void>();
 
   constructor(private authGoogleService: AuthGoogleService) { }
