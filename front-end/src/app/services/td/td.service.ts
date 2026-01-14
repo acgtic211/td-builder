@@ -314,9 +314,9 @@ export class TdService {
     return this.http.delete<void>(url, this.httpOptions);
   }
 
-  searchTds(id: string, term: string): Observable<ThingDescriptionDto[]> {
+  searchTds(term: string): Observable<ThingDescriptionDto[]> {
   if (!term.trim()) return of([]);
-  const url = `${this.apiUrl}/${encodeURIComponent(id)}/thing-descriptions?name=${encodeURIComponent(term)}`;
+  const url = `${this.apiUrl}/thing-descriptions/search?name=${encodeURIComponent(term)}`;
   
   return this.http.get<ThingDescriptionDto[]>(url, this.httpOptions)
     .pipe(

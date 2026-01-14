@@ -42,7 +42,7 @@ export class MyTdsComponent  implements OnInit {
   private loadUserTds(name?: string) {
     this.loading.set(true);
     const obs = name && name.trim()
-      ? this.tdService.searchTds("hola", name.trim()) // crea otro método
+      ? this.tdService.searchTds(name.trim()) // crea otro método
       : this.tdService.getUserTds();
 
     obs.subscribe({

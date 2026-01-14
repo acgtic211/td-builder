@@ -112,11 +112,17 @@ public class Controller {
       return ResponseEntity.ok(list);
   }
 
-  @GetMapping("/{userId}/thing-descriptions")
-  public ResponseEntity<List<ThingDescription>> searchTdByNameFromUser(@PathVariable String userId, @RequestParam(name = "name", required = false) String name) {
-    List<ThingDescription> list = (name != null && !name.trim().isEmpty())
-        ? thingDescriptionRepository.findAllByOwner_IdAndNameContainingIgnoreCase(userId, name.trim())
-        : thingDescriptionRepository.findAllByOwner_Id(userId);
+  @GetMapping("/thing-descriptions/search")
+  public ResponseEntity<List<ThingDescription>> searchMyTds(
+      @RequestParam(name = "name", required = false) String name,
+      Authentication authentication
+  ) {
+    User currentUser = getCurrentUser(authentication);
+
+    String term = (name == null) ? "" : name.trim();
+    List<ThingDescription> list = term.isEmpty()
+        ? thingDescriptionRepository.findAllByOwner_Id(currentUser.getId())
+        : thingDescriptionRepository.findAllByOwner_IdAndNameContainingIgnoreCase(currentUser.getId(), term);
 
     return ResponseEntity.ok(list);
   }
