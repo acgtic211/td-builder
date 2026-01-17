@@ -41,12 +41,16 @@ export class ChatInnerComponent {
   isLoading = signal(false);
 
   mode = signal<'user-faq' | 'user-generator'>('user-faq');
-  setMode(m: 'user-faq' | 'user-generator') { this.mode.set(m); }
+  setMode(m: 'user-faq' | 'user-generator') { this.mode.set(m); this.limpiarConversacion(m)}
   modeLabel(m: Message): 'FAQ' | 'Generar TD' | 'ChatWot'{
     if (m.author === 'user-faq') return 'FAQ';;
     if (m.author === 'user-generator') return 'Generar TD';
 
     return 'ChatWot';
+  }
+
+  limpiarConversacion(m: 'user-faq' | 'user-generator') {
+    this.geminiService.resetChat(m); // Limpia la memoria de la IA
   }
 
   private persistEffect = effect(() => {
@@ -115,10 +119,10 @@ export class ChatInnerComponent {
       const anyTd = td as any;
       const name = anyTd?.title || 'TD desde chat';
       this.tdService.setFromJson(anyTd, name);
-      await this.dialog.info('TD enviada al editor', `La Thing Description "${name}" se ha cargado correctamente.`);
+      await this.dialog.info('TD sent to editor', `The Thing Description "${name}" has been loaded successfully.`);
     } catch (e) {
       console.error(e);
-      await this.dialog.info('TD enviada al editor', `No se pudo enviar la TD al editor.`);
+      await this.dialog.info('TD not sent to editor', `Could not send the TD to the editor.`);
     }
   }
   
@@ -133,8 +137,15 @@ export class ChatInnerComponent {
     }, 0);
   }
 
-  formatContent(content: string): string {
-    return content.replace(/\n/g, '<br>');
+  formatContent(content: any): string {
+    // 1. Si es null o undefined, devolvemos cadena vacía
+    if (!content) return '';
+
+    // 2. Si NO es un string (es un objeto o número), lo convertimos a string
+    if (typeof content !== 'string') {
+      content = String(content); // O JSON.stringify(content) si prefieres ver el objeto
+    }
+    return content.replace(/\n/g, '<br>'); 
   }
 
   asJson(obj: unknown): any {
