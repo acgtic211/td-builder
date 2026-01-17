@@ -9,6 +9,7 @@
 .editor-view {
   margin: 2.5%;
 
+  // HEADER SECTION
   .editor-head {
     display: flex;
     align-items: center;
@@ -22,9 +23,9 @@
     }
 
     .btn-ghost {
-      border: 1px solid #e5e7eb;        // $border
-      background: #fff;                  // panel blanco
-      color: #2f55d4;                    // $brand-600
+      border: 1px solid #e5e7eb; // $border
+      background: #fff;          // panel blanco
+      color: #2f55d4;            // $brand-600
       border-radius: 8px;
       padding: 6px 10px;
       font-weight: 600;
@@ -32,16 +33,29 @@
       cursor: pointer;
       transition: background .15s ease, transform .12s ease, border-color .15s ease;
 
-      &:hover { background: #f8fafc; border-color: #d0d5dd; transform: translateY(-1px); }
-      &:active { transform: translateY(0); }
+      &:hover {
+        background: #f8fafc;
+        border-color: #d0d5dd;
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
     }
   }
 
+  // ACCORDION (DETAILS & SUMMARY)
   details {
     background: white;
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 1rem;
+
+    // Estilo cuando está abierto
+    &[open] .arrow {
+      transform: rotate(90deg);
+    }
 
     summary {
       display: flex;
@@ -69,99 +83,39 @@
         }
       }
 
+      // Botón "Añadir (+)" en la cabecera
       .icon-btn {
         background: none;
         border: none;
         padding: 0;
         margin: 0;
         cursor: pointer;
-      
         width: 25px;
         height: 25px;
-      
         display: inline-flex;
         align-items: center;
         justify-content: center;
-      
+
         img {
           width: 100%;
           height: 100%;
           transition: transform 0.2s ease;
         }
-      
+
         &:hover img {
           transform: scale(1.1);
         }
-      }      
+      }
     }
 
-    .vacio{
+    // Mensaje de lista vacía
+    .vacio {
       padding-left: 20px;
       font-style: italic;
     }
   }
 
-  details[open] .arrow {
-    transform: rotate(90deg);
-  }
-
-  .form-buttons {
-    display: flex;
-    gap: 0.5rem;
-  
-    button {
-      background: none;
-      border: none;
-      padding: 0;
-      margin: 0;
-      cursor: pointer;
-    
-      width: 25px;
-      height: 25px;
-    
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-  
-      img {
-        width: 100%;
-        height: 100%;
-        transition: transform 0.2s ease;
-      }
-    
-      &:hover img {
-        transform: scale(1.1);
-      }
-    }
-  }
-
-  .buttons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  
-    button {
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.2s ease, transform 0.1s ease;
-  
-      &:hover {
-        background-color: #1666c1;
-      }
-  
-      &:active {
-        transform: scale(0.97);
-      }
-    }
-  }
-
+  // LISTS & ITEMS
   ul {
     list-style: none;
     padding: 0;
@@ -173,40 +127,36 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 10px 15px 10px 20px;
       border-bottom: 1px solid #eee;
       background-color: white;
       transition: background-color 0.2s;
       flex-grow: 1;
       cursor: pointer;
-      padding: 10px;
-      padding-left: 20px;
-      padding-right: 15px;
 
-      div{
+      div {
         width: 100%;
       }
 
+      // Botón de eliminar (basura/cancelar) en la lista
       button {
         background: none;
         border: none;
         padding: 0;
         margin: 0;
         cursor: pointer;
-      
         width: 18px;
         height: 18px;
-      
         display: inline-flex;
         align-items: center;
         justify-content: center;
-    
+
         img {
           width: 100%;
           height: 100%;
           transition: transform 0.2s ease;
         }
-      
+
         &:hover img {
           transform: scale(1.1);
         }
@@ -218,6 +168,100 @@
 
       &:hover {
         background-color: #f9f9f9;
+      }
+    }
+  }
+
+  // FORM ACTION BUTTONS (Tick/Cancel)
+  .form-buttons {
+    display: flex;
+    gap: 0.5rem;
+
+    button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      width: 25px;
+      height: 25px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover img {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .bottom-actions-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    border-top: 1px solid #eee;
+    margin-top: 1rem;
+  }
+
+  // =========================================
+  // GLOBAL FOOTER BUTTONS
+  // =========================================
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap; // Por si la pantalla es pequeña
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem; // Un poco más grandes para facilitar el clic
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      color: white; // Texto blanco por defecto
+
+      &:active {
+        transform: scale(0.97);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      // 1. Botón de USUARIO (El más importante: Azul)
+      &.btn-user {
+        background-color: #1a73e8; // Google Blue
+        font-size: 1rem; // Ligeramente más grande
+        
+        &:hover { background-color: #1557b0; }
+      }
+
+      // 2. Botones de ARCHIVO (Open/Download: Verde)
+      &.btn-file {
+        background-color: #28a745; // Verde éxito
+        
+        &:hover { background-color: #218838; }
+      }
+
+      // 3. Botón DESTRUCTIVO (Clear: Rojo)
+      &.btn-danger {
+        background-color: #dc3545; // Rojo alerta
+        
+        &:hover { background-color: #c82333; }
+      }
+
+      // 4. Botón SECUNDARIO (Create New: Gris oscuro)
+      &.btn-secondary {
+        background-color: #6c757d; // Gris neutro
+        
+        &:hover { background-color: #5a6268; }
       }
     }
   }

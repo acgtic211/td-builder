@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { NgIf, NgFor, AsyncPipe, CommonModule } from '@angular/common';
 import { DesplegablesService } from '../../services/desplegables/desplegables.service';
 import { TdService } from '../../services/td/td.service';
 import { GeneralComponent } from './general/general.component';
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [AsyncPipe, NgIf, NgFor, GeneralComponent, PropiedadComponent, AccionComponent, EventoComponent, LinksComponent],
+  imports: [CommonModule, AsyncPipe, NgIf, NgFor, GeneralComponent, PropiedadComponent, AccionComponent, EventoComponent, LinksComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
@@ -651,4 +651,22 @@ export class EditorComponent implements OnInit, OnDestroy{
     });
   }
 
+  gestionarBotones(seccion: string, accion: 'guardar' | 'cancelar') {
+    if (accion === 'guardar') {
+      switch (seccion) {
+        case 'propiedad': this.guardarPropiedad(); break;
+        case 'accion':    this.guardarAccion(); break;
+        case 'evento':    this.guardarEvento(); break;
+        case 'link':      this.guardarLink(); break;
+      }
+    } else {
+      // Es cancelar
+      switch (seccion) {
+        case 'propiedad': this.cancelarPropiedad(); break;
+        case 'accion':    this.cancelarAccion(); break;
+        case 'evento':    this.cancelarEvento(); break;
+        case 'link':      this.cancelarLink(); break;
+      }
+    }
+  }
 }
