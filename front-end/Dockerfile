@@ -1,6 +1,8 @@
 # Etapa 1: Build de la aplicación Angular
 FROM node:20.14.0-bullseye-slim AS build-step
 
+ARG GEMINI_KEY_ARG
+
 # Crear directorio de trabajo
 WORKDIR /app
 
@@ -10,6 +12,7 @@ RUN npm install
 
 # Copiar el resto de la app y construirla
 COPY front-end/. .
+RUN sed -i "s|GEMINI_API_KEY_PLACEHOLDER|$GEMINI_KEY_ARG|g" src/app/environments/environment.ts
 RUN npm run build
 
 # Etapa 2: Servir con Nginx

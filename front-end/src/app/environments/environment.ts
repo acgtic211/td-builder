@@ -2,6 +2,6 @@
 export const environment = {
   production: false,
   apiBase: '/api',
-  geminiApiKey: ''
+  geminiApiKey: 'GEMINI_API_KEY_PLACEHOLDER'
 };
 
