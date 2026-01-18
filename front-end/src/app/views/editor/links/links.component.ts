@@ -26,7 +26,6 @@ export class LinksComponent implements OnInit {
       };
     }
 
-    // 🔧 Normalizar arrays: si tipo es 'array' y el valor es string, convertir a array
     for (const key in this.datos) {
       const attrInfo = atributosLink.find(a => a.nombre === key);
       if (attrInfo?.type === 'array' && typeof this.datos[key] === 'string') {

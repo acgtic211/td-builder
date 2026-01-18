@@ -52,12 +52,18 @@ export class EditorComponent implements OnInit, OnDestroy{
   user$ = this.authGoogleService.user$;
   isUpdate: boolean = false;
   private sub2?: Subscription;
+  private updateSub?: Subscription;
 
   ngOnInit(): void {
     this.cargatTd();
 
     this.sub2 = this.tdService.isUpdate$.subscribe(estado => {
       this.isUpdate = estado;
+    });
+
+    this.updateSub = this.tdService.tdUpdated$.subscribe(() => {
+      this.cargatTd();
+      this.autoOpenSections(); 
     });
   }
   
@@ -71,6 +77,7 @@ export class EditorComponent implements OnInit, OnDestroy{
 
   ngOnDestroy() {
     this.sub2?.unsubscribe();
+    this.updateSub?.unsubscribe();
   }
 
   get areAllOpen(): boolean {
@@ -439,8 +446,7 @@ export class EditorComponent implements OnInit, OnDestroy{
       a.remove();
     } catch (err) {
       console.error('Error al descargar la TD:', err);
-      // Aquí si quieres puedes mostrar un toast o setear un estado de error
-      // this.mensajeError = 'Error al descargar la Thing Description.';
+      alert('Error al descargar la TD');
     }
   }
 

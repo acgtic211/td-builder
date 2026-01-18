@@ -37,9 +37,7 @@ export class AccionComponent implements OnInit {
     }
 
     this.atributosDrop = Object.keys(this.datos)
-      .filter(nombre =>
-        !['@type', 'type', 'title', 'description', 'nombre'].includes(nombre)
-      )
+      .filter(nombre => !['@type', 'type', 'title', 'description', 'nombre'].includes(nombre))
       .map(nombre => {
         const attrInfo =
           atributosInteracciones.find(a => a.nombre === nombre) ??
@@ -50,7 +48,8 @@ export class AccionComponent implements OnInit {
 
         // Si es schema, inicializar estructura + detectar tipoSeleccionado
         if (tipo === 'schema') {
-          const typeStr = this.datos[nombre]?.type?.toLowerCase?.() ?? '';
+          const schemaData = this.datos[nombre] || {};
+          const typeStr = schemaData.type?.toLowerCase?.() ?? '';
 
           const tipoDetectado = tiposSchema.find(
             t => t.nombre.toLowerCase() === typeStr
@@ -59,8 +58,32 @@ export class AccionComponent implements OnInit {
           attr.schema = {
             tipoSeleccionado: tipoDetectado
           };
-        }
 
+          if (!schemaData.atributos) {
+            schemaData.atributos = [];
+          }
+
+          const clavesReservadas = ['@type', 'title', 'description', 'type', 'atributos'];
+
+          // Recorremos las claves del objeto (ej: input: { type: "integer", minimum: 5 })
+          Object.keys(schemaData).forEach(clave => {
+            // Si es una propiedad válida (ej: 'minimum') y no es metadato
+            if (!clavesReservadas.includes(clave)) {
+              // Verificamos si existe en tu lista de atributos conocidos
+              const defAtributo = atributosSchema.find(a => a.nombre === clave);
+              // Evitar duplicados si Angular ya lo hubiera inicializado
+              const yaExiste = schemaData.atributos.some((a: any) => a.nombre === clave);
+
+              if (defAtributo && !yaExiste) {
+                schemaData.atributos.push({
+                  nombre: clave,
+                  type: defAtributo.type,
+                  valor: schemaData[clave]
+                });
+              }
+            }
+          });
+        }
         return attr;
       });
 

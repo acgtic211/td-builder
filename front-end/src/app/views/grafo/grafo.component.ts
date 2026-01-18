@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { TdService } from '../../services/td/td.service';
 import * as d3 from 'd3';
+import { Subscription } from 'rxjs';
 
 // Tipo extendido para nodos jerárquicos
 interface CustomHierarchyNode extends d3.HierarchyNode<any> {
@@ -17,18 +18,33 @@ interface CustomHierarchyNode extends d3.HierarchyNode<any> {
   templateUrl: './grafo.component.html',
   styleUrl: './grafo.component.scss'
 })
-export class GrafoComponent implements OnInit {
+export class GrafoComponent implements OnInit, OnDestroy {
   @ViewChild('treeContainer', { static: true }) container!: ElementRef;
+  private updateSub?: Subscription
 
   constructor(private tdService: TdService) {}
 
   ngOnInit(): void {
+    this.dibujarGrafo();
+
+    this.updateSub = this.tdService.tdUpdated$.subscribe(() => {
+      this.dibujarGrafo();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.updateSub?.unsubscribe();
+  }
+
+  dibujarGrafo() {
+    d3.select(this.container.nativeElement).selectAll('*').remove();
     const data = this.tdService.obtenerTD();
-    const hierarchy = this.buildHierarchy(data);
+    const name = this.tdService.getNameTD();
+    const hierarchy = this.buildHierarchy(data, name);
     this.renderTree(hierarchy);
   }
 
-  buildHierarchy(obj: any, name: string = 'TD'): any {
+  buildHierarchy(obj: any, name: string): any {
     const children: any[] = [];
 
     if (Array.isArray(obj)) {

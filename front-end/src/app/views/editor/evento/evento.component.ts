@@ -49,7 +49,8 @@ export class EventoComponent implements OnInit{
 
         // Si es schema, inicializar estructura + detectar tipoSeleccionado
         if (tipo === 'schema') {
-          const typeStr = this.datos[nombre]?.type?.toLowerCase?.() ?? '';
+          const schemaData = this.datos[nombre] || {};
+          const typeStr = schemaData.type?.toLowerCase?.() ?? '';
 
           const tipoDetectado = tiposSchema.find(
             t => t.nombre.toLowerCase() === typeStr
@@ -58,6 +59,31 @@ export class EventoComponent implements OnInit{
           attr.schema = {
             tipoSeleccionado: tipoDetectado
           };
+
+          if (!schemaData.atributos) {
+            schemaData.atributos = [];
+          }
+
+          // C) Recuperar atributos planos (min, max, unit...) y meterlos en la lista visual
+          const clavesReservadas = ['@type', 'title', 'description', 'type', 'atributos'];
+
+          Object.keys(schemaData).forEach(clave => {
+            if (!clavesReservadas.includes(clave)) {
+              // Buscar definición para saber el TIPO visual (integer, boolean, etc.)
+              const defAtributo = atributosSchema.find(a => a.nombre === clave);
+              
+              // Evitar duplicados
+              const yaExiste = schemaData.atributos.some((a: any) => a.nombre === clave);
+
+              if (defAtributo && !yaExiste) {
+                schemaData.atributos.push({
+                  nombre: clave,
+                  type: defAtributo.type, // <--- CLAVE PARA QUE SE VEA EL INPUT
+                  valor: schemaData[clave]
+                });
+              }
+            }
+          });
         }
 
         return attr;

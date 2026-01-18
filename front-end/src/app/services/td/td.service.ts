@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, EMPTY, empty, map, Observable, of, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, empty, map, Observable, of, Subject, tap, throwError } from 'rxjs';
 import { AuthGoogleService } from '../auth/auth-google.service';
 import { ThingDescriptionDto } from '../../models/thing-description.model';
 import { environment } from '../../environments/environment';
@@ -13,6 +13,9 @@ export class TdService {
   constructor(private http: HttpClient, private authGoogleService: AuthGoogleService) { 
     this.loadState();
   }
+
+  private tdUpdateSubject = new Subject<void>();
+  tdUpdated$ = this.tdUpdateSubject.asObservable();
 
   // === Configuración / Persistencia ===
   private apiUrl = environment.apiBase + '/save'; // URL to web api
@@ -225,6 +228,7 @@ export class TdService {
     // clonar para evitar referencias compartidas
     this.td = JSON.parse(JSON.stringify(td));
     this.touch();
+    this.tdUpdateSubject.next();
   }
 
   //Métodos para persistencia local (sessionStorage)
