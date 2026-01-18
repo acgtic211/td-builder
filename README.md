@@ -42,7 +42,15 @@ git clone https://github.com/acgtic211/TDBuilder.git
 cd TDBuilder
 ```
 
-### 2. Start the tool with Docker
+### 2. Configure the API Key
+
+To enable ChatWot (the AI assistant), you need to edit the .env file in the root directory and add the Google Gemini API Key.
+
+```bash
+MY_GEMINI_KEY=RealApiKeyHere...
+```
+
+### 3. Start the tool with Docker
 
 Make sure you have **Docker** and **Docker Compose** installed.
 
@@ -52,7 +60,7 @@ docker-compose up --build -d
 
 > This will build and run the application in detached mode.
 
-### 3. Open your browser
+### 4. Open your browser
 
 Once the container is running, access the tool at:
 
