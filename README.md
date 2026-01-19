@@ -44,7 +44,24 @@ cd TDBuilder
 
 ### 2. Configure the API Key
 
-To enable ChatWot (the AI assistant), you need to edit the .env file in the root directory and add the Google Gemini API Key.
+To enable **ChatWot** (the AI assistant), you need to obtain a **Google Gemini API Key** and add it to the `.env` file located in the root directory of the project.
+
+#### Steps to get a Gemini API Key
+
+1. Go to **Google AI Studio**:  
+   https://aistudio.google.com/
+
+2. Sign in with your Google account.
+
+3. In the dashboard, click on **“Get API key”** or go to the **API Keys** section.
+
+4. Create a new API key (or use an existing one).
+
+5. Copy the generated API key.
+
+#### Add the API Key to the `.env` file
+
+Once you have copied your API key, open the `.env` file in the root directory of the project and add the following line:
 
 ```bash
 MY_GEMINI_KEY=RealApiKeyHere...
@@ -77,6 +94,7 @@ http://localhost
 - Docker  
 - Docker Compose  
 - Modern web browser (Chrome, Firefox, Edge...)
+- Google Gemini API key
 
 ---
 
